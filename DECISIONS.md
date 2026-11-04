@@ -25,3 +25,9 @@ Who: Yuval
 ---
 
 <!-- Your entries start here -->
+
+## Decisions 
+
+## 2026-11-04
+Decided on the game idea, thought of the basic concept and meta progression and written all in the pitch file.
+also Created a Unity Project and started working on the basic tapping for DNA strands.

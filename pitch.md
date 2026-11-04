@@ -13,25 +13,36 @@
 Keep it to one page. Short answers are fine.
 
 ## Core loop
-What does the player do again and again, with one thumb?
+>What does the player do again and again, with one thumb?
+
+The player will have a DNA Hive that he can tap to gain DNA Points and over time have Other Organisms that will help him gain even more and so on and so forth.
 
 ## Meta
-What do they earn, spend and unlock?
+> What do they earn, spend and unlock?
+
+the DNA points can be used to upgrade the Tap Output, Recruit Organisms to help gain more DNA and unlock upgrades and abilities to increase the DNA Generation.
+
+also there will be achievements that will grant generation multipliers so the player should try to accomplish them.
 
 ## Why come back?
-Which 2 hooks bring players back tomorrow? (daily reward, streak, event, lives, collection, notification…)
+> Which 2 hooks bring players back tomorrow? (daily reward, streak, event, lives, collection, notification…)
+
+The game will run in a slow pace while the app is closed so the user will collect DNA even while not playing but at a slower pace, every day there will be 3 Free Super-Boosters that increase generation by 300% and after using the boosters you can gain another one by watching an ad.
+
 
 ## Who and when
-Who plays it, where, and how long is one session? (target: 1–3 minutes)
+> Who plays it, where, and how long is one session? (target: 1–3 minutes)
+
+The game is intended for everyone, especially for people who are interested in Biology, it can be played anywhere, anytime and sessions can be quick 1 minute sessions or tapping for 30 mins.
 
 ## Goals
-What does the player achieve? List the moments of progress (level completed, upgrade unlocked, new record…).
+> What does the player achieve? List the moments of progress (level completed, upgrade unlocked, new record…).
+
+there would be several DNA/sec Milestone where the Theme of the DNA Hive will change, it starts as a small cellular hive, then developing to microscopic creatures, bugs, animals and then humans (maybe space and aliens).
+
+while progressing there would be achievements based on Total DNA gained, Maximum DNA held, DNA/sec records etc..
 
 ## Feel
-What will feel "crunchy"? (sound, motion, particles, haptics, timing, numbers)
+> What will feel "crunchy"? (sound, motion, particles, haptics, timing, numbers)
 
-## Scope check
-- [ ] Hybrid-casual: simple core + a meta layer
-- [ ] Portrait, one thumb
-- [ ] 1–3 minute sessions
-- [ ] Small: about 3 levels (more for a team of 2–3)
+The biggest "crunchy" feel would be the numbers increasing fast, add a booster that it's value would be based upon player skill (amount of taps in 5 seconds after activation), vfx to increase the feeling of generating a lot of DNA, visual representation of all the player's units.

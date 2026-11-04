@@ -1,10 +1,11 @@
-# [Game name]
+# Cell Clicker
 
-**Team:** [Name 1] · [Name 2] · [Name 3]
+**Team:** Yoav Gershman
 **Course:** Mobile Game Development, Shenkar
 
 ## The game in one sentence
-[What does the player do, and why do they come back tomorrow?]
+In the game the player starts as a singular cell where he can create DNA by clicking on a Cell Hive, the meta progression will be that he will be able to increase the amount of DNA he gets by clicking,
+Add Bigger units that can mine more DNA, give each unit upgrades and have boosters to increase the DNA further.
 
 ## How to open and build
 1. Open the project in Unity 6 LTS (the exact version is on Moodle).

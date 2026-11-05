@@ -59,7 +59,7 @@ Review the planned change against this checklist first, then write it. In the re
 - Don't change Player Settings, package name, API levels or build settings unless asked.
 - Keep changes small and explain what you changed and why.
 - Never commit secrets (keystores, passwords, API keys).
-- Never edit `DECISIONS.md`. Only the team writes in it. If a decision is worth logging, suggest it in chat instead.
+- `DECISIONS.md` belongs to the team. Touch it only when the user explicitly asks in that request. Even then, only add new text (e.g. a new entry or a formatting fix they asked for). Never change or delete text the team wrote. Otherwise, suggest decisions worth logging in chat.
 - Use the terms in `GLOSSARY.md` in code, UI text and docs.
 
 ## Conventions

@@ -14,6 +14,7 @@ namespace CellClicker.UI
     {
         [SerializeField] private DnaBank bank;
         [SerializeField] private DnaHive hive;
+        [SerializeField] private TapPower tapPower;
         [SerializeField] private TMP_Text amountText;
         [SerializeField] private TMP_Text perTapText;
 
@@ -30,16 +31,27 @@ namespace CellClicker.UI
         private float bump;
         private Color baseColor;
 
-        private void OnEnable() => hive.Tapped += OnHiveTapped;
-        private void OnDisable() => hive.Tapped -= OnHiveTapped;
+        private void OnEnable()
+        {
+            hive.Tapped += OnHiveTapped;
+            tapPower.Changed += RefreshPerTapText;
+        }
+
+        private void OnDisable()
+        {
+            hive.Tapped -= OnHiveTapped;
+            tapPower.Changed -= RefreshPerTapText;
+        }
 
         private void Start()
         {
             baseColor = amountText.color;
             shown = bank.Amount;
             RefreshAmountText();
-            perTapText.text = "+" + NumberFormatter.Format(hive.DnaPerTap) + " per tap";
+            RefreshPerTapText();
         }
+
+        private void RefreshPerTapText() => perTapText.text = "+" + NumberFormatter.FormatRate(tapPower.Value) + " per tap";
 
         private void OnHiveTapped(HiveTap tap) => bump = 1f;
 

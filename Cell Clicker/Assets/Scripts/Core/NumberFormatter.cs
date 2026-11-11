@@ -23,12 +23,15 @@ namespace CellClicker.Core
             return scaled.ToString("0.##", CultureInfo.InvariantCulture) + Suffixes[tier];
         }
 
-        /// <summary>Like <see cref="Format"/>, but keeps one decimal below 100 so small DNA/sec rates (e.g. 0.1) don't show as 0.</summary>
+        /// <summary>
+        /// Like <see cref="Format"/>, but keeps one decimal below 100 so small values (0.5 DNA/sec, 1.2 Tap Power) don't round down.
+        /// </summary>
         public static string FormatRate(double value)
         {
             if (value >= 100) return Format(value);
 
-            double floored = Math.Floor(value * 10) / 10;
+            // The tiny nudge stops float error (1.7999999 for 1.8) from flooring a step away.
+            double floored = Math.Floor(value * 10 + 1e-6) / 10;
             return floored.ToString("0.#", CultureInfo.InvariantCulture);
         }
     }

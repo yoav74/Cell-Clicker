@@ -51,7 +51,7 @@ namespace CellClicker.UI
             if (tap.Amount != lastAmount)
             {
                 lastAmount = tap.Amount;
-                lastLabel = "+" + NumberFormatter.Format(tap.Amount);
+                lastLabel = "+" + NumberFormatter.FormatRate(tap.Amount);
             }
 
             Spawn(lastLabel, tap.ScreenPosition, tap.EventCamera);

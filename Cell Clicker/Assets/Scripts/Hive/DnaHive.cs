@@ -15,17 +15,18 @@ namespace CellClicker.Hive
     public class DnaHive : MonoBehaviour, IPointerDownHandler
     {
         [SerializeField] private DnaBank bank;
-        [SerializeField] private double dnaPerTap = 1;
+        [SerializeField] private TapPower tapPower;
 
-        public double DnaPerTap => dnaPerTap;
+        public double DnaPerTap => tapPower.Value;
 
         /// <summary>Fired after DNA has been added for a tap.</summary>
         public event Action<HiveTap> Tapped;
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            bank.Add(dnaPerTap);
-            Tapped?.Invoke(new HiveTap(eventData.position, eventData.pressEventCamera, dnaPerTap));
+            double amount = tapPower.Value;
+            bank.Add(amount);
+            Tapped?.Invoke(new HiveTap(eventData.position, eventData.pressEventCamera, amount));
         }
     }
 }

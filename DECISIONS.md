@@ -26,6 +26,18 @@ Who: Yuval
 
 <!-- Your entries start here -->
 
+## 2026-11-11 — Home screen before the Level
+Options: open straight into the Hive / Home screen first, then the Level
+Chose: Home screen first (DNA total and the "While you were away" card), Play goes to the Level 
+AI: suggested to separate into a Home screen and the play scene
+Who: Yoav Gershman
+
+## 2026-11-11 — Package name and minimum Android version
+Options: set my own
+Chose: company "Xision", package com.Xision.CellClicker, minimum Android SDK 29 (Android 10) in the slides shown in class it was the minimum
+AI: not used, Xision is my Gamer tag so i made that the company name and Cell Clicker was the name chosen for the game
+Who: Yoav Gershman
+
 ## 2026-11-05 — Saves: local first, optional Account with Cloud Save
 Options: local save only / local save + optional Account with Cloud Save / Account required
 Chose: local save (JSON file, autosave every few seconds and when the app is paused or closed), plus an optional Account that backs progress up to the cloud. Linking an Account unlocks an Achievement.

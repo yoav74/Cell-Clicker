@@ -1,4 +1,5 @@
 using CellClicker.Core;
+using CellClicker.Hive;
 using CellClicker.Organisms;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,13 +7,15 @@ using UnityEngine.UI;
 namespace CellClicker.UI
 {
     /// <summary>
-    /// Opens the Organisms popup. Shows a badge and gently pulses while the player can afford something,
+    /// Opens the Organisms popup. Shows a badge and gently pulses while the player can afford something
+    /// (Tap Power or an Organism),
     /// so the next goal is visible without distracting from tapping the hive.
     /// </summary>
     [RequireComponent(typeof(Button))]
     public class OrganismShopButton : MonoBehaviour
     {
         [SerializeField] private OrganismRoster roster;
+        [SerializeField] private TapPower tapPower;
         [SerializeField] private DnaBank bank;
         [SerializeField] private PopupPanel popup;
         [SerializeField] private GameObject badge;
@@ -32,6 +35,7 @@ namespace CellClicker.UI
         {
             bank.Changed += OnDnaChanged;
             roster.LevelChanged += OnLevelChanged;
+            tapPower.Changed += Refresh;
             Refresh();
         }
 
@@ -39,6 +43,7 @@ namespace CellClicker.UI
         {
             bank.Changed -= OnDnaChanged;
             roster.LevelChanged -= OnLevelChanged;
+            tapPower.Changed -= Refresh;
         }
 
         private void Update()
@@ -55,7 +60,7 @@ namespace CellClicker.UI
         private void Refresh()
         {
             // Runs every frame while DNA/sec flows in: indexed loop, because foreach over an interface allocates.
-            bool any = false;
+            bool any = tapPower.CanLevelUp;
             var organisms = roster.Organisms;
             for (int i = 0; i < organisms.Count && !any; i++)
             {

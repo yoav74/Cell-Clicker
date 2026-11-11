@@ -1,4 +1,5 @@
 using CellClicker.Core;
+using CellClicker.Hive;
 using CellClicker.Organisms;
 using CellClicker.UI;
 using TMPro;
@@ -10,7 +11,7 @@ namespace CellClicker.EditorTools
 {
     /// <summary>
     /// Builds the Organisms button (bottom-left, below the play area) and the Organisms popup
-    /// (a bottom sheet with a scrolling list of Organisms). Called by <see cref="HiveSceneBuilder"/>.
+    /// (a bottom sheet with a scrolling list: Tap Power first, then the Organisms). Called by <see cref="HiveSceneBuilder"/>.
     /// </summary>
     public static class OrganismShopBuilder
     {
@@ -31,15 +32,15 @@ namespace CellClicker.EditorTools
         private static readonly Color Subtle = new Color32(150, 180, 190, 220);
         private static readonly Color Dim = new Color(0f, 0f, 0f, 0.7f);
 
-        public static void Build(Transform canvas, Transform safeArea, DnaBank bank, OrganismRoster roster)
+        public static void Build(Transform canvas, Transform safeArea, DnaBank bank, TapPower tapPower, OrganismRoster roster)
         {
-            PopupPanel popup = BuildPopup(canvas, bank, roster);
-            BuildButton(safeArea, bank, roster, popup);
+            PopupPanel popup = BuildPopup(canvas, bank, tapPower, roster);
+            BuildButton(safeArea, bank, tapPower, roster, popup);
         }
 
         // ---------- Button ----------
 
-        private static void BuildButton(Transform safeArea, DnaBank bank, OrganismRoster roster, PopupPanel popup)
+        private static void BuildButton(Transform safeArea, DnaBank bank, TapPower tapPower, OrganismRoster roster, PopupPanel popup)
         {
             RectTransform root = Pin(Create("Organisms Button", safeArea), Vector2.zero, ButtonSize, ButtonMargin);
             AddImage(root.gameObject, Color.clear, raycast: true); // the whole area (circle + label) is tappable
@@ -89,6 +90,7 @@ namespace CellClicker.EditorTools
 
             var shopButton = root.gameObject.AddComponent<OrganismShopButton>();
             Wire(shopButton, "roster", roster);
+            Wire(shopButton, "tapPower", tapPower);
             Wire(shopButton, "bank", bank);
             Wire(shopButton, "popup", popup);
             Wire(shopButton, "badge", badge.gameObject);
@@ -98,7 +100,7 @@ namespace CellClicker.EditorTools
 
         // ---------- Popup ----------
 
-        private static PopupPanel BuildPopup(Transform canvas, DnaBank bank, OrganismRoster roster)
+        private static PopupPanel BuildPopup(Transform canvas, DnaBank bank, TapPower tapPower, OrganismRoster roster)
         {
             RectTransform root = Create("Organisms Popup", canvas);
             Stretch(root);
@@ -141,7 +143,7 @@ namespace CellClicker.EditorTools
             AddText(title.gameObject, "Organisms", 76, Color.white, TmpSetup.PopupPreset, TextAlignmentOptions.Left);
 
             RectTransform subtitle = PinTop(Create("Subtitle", sheet), 144f, 50f, 58f, 200f);
-            AddText(subtitle.gameObject, "Recruit Organisms to earn DNA/sec", 36, Subtle, TmpSetup.SoftShadowPreset, TextAlignmentOptions.Left);
+            AddText(subtitle.gameObject, "Boost your taps and recruit Organisms", 36, Subtle, TmpSetup.SoftShadowPreset, TextAlignmentOptions.Left);
 
             RectTransform close = Pin(Create("Close Button", sheet), Vector2.one, new Vector2(MinTapSize, MinTapSize), new Vector2(-36f, -30f));
             Image closeImage = AddRounded(close.gameObject, new Color(1f, 1f, 1f, 0.1f), MinTapSize * 0.5f, raycast: true);
@@ -152,7 +154,9 @@ namespace CellClicker.EditorTools
             AddText(closeMark.gameObject, "X", 56, Color.white, TmpSetup.PopupPreset);
 
             RectTransform content = BuildList(sheet);
-            OrganismRowUI rowTemplate = BuildRowTemplate(content);
+            // Template first (hidden at runtime), then Tap Power, so the cloned Organism rows land below it.
+            OrganismRowUI rowTemplate = BuildRow<OrganismRowUI>(content, "Row Template", ProceduralSpriteKind.Microbe);
+            BuildTapPowerRow(content, bank, tapPower);
 
             var popup = root.gameObject.AddComponent<PopupPanel>();
             Wire(popup, "sheet", sheet);
@@ -208,9 +212,17 @@ namespace CellClicker.EditorTools
             return content;
         }
 
-        private static OrganismRowUI BuildRowTemplate(RectTransform content)
+        private static void BuildTapPowerRow(RectTransform content, DnaBank bank, TapPower tapPower)
         {
-            RectTransform row = Create("Row Template", content);
+            var row = BuildRow<TapPowerRowUI>(content, "Tap Power Row", ProceduralSpriteKind.Cell);
+            Wire(row, "tapPower", tapPower);
+            Wire(row, "bank", bank);
+        }
+
+        // The shared row look; T says what the row sells.
+        private static T BuildRow<T>(RectTransform content, string name, ProceduralSpriteKind iconKind) where T : ShopRowUI
+        {
+            RectTransform row = Create(name, content);
             AddRounded(row.gameObject, RowColor, 36f);
             var element = row.gameObject.AddComponent<LayoutElement>();
             element.minHeight = element.preferredHeight = RowHeight;
@@ -222,7 +234,7 @@ namespace CellClicker.EditorTools
             AddPlaceholder(iconBack.gameObject, ProceduralSpriteKind.Pill, new Color(0f, 0f, 0f, 0.28f));
 
             RectTransform icon = Pin(Create("Icon", iconBack), new Vector2(0.5f, 0.5f), new Vector2(120f, 120f), Vector2.zero);
-            Image iconImage = AddPlaceholder(icon.gameObject, ProceduralSpriteKind.Microbe, Color.white);
+            Image iconImage = AddPlaceholder(icon.gameObject, iconKind, Color.white);
 
             TMP_Text nameText = AddText(RowText("Name", row, 4f, 64f).gameObject, "Organism", 50, Color.white, TmpSetup.SoftShadowPreset, TextAlignmentOptions.Left);
             TMP_Text infoText = AddText(RowText("Info", row, -56f, -4f).gameObject, "+0.1 DNA/sec", 34, Subtle, TmpSetup.SoftShadowPreset, TextAlignmentOptions.Left);
@@ -232,7 +244,7 @@ namespace CellClicker.EditorTools
             var buyButton = buy.gameObject.AddComponent<Button>();
             buyButton.targetGraphic = buyImage;
             ColorBlock colors = buyButton.colors;
-            colors.disabledColor = Color.white; // OrganismRowUI colors the button itself
+            colors.disabledColor = Color.white; // ShopRowUI colors the button itself
             buyButton.colors = colors;
 
             RectTransform action = PinTop(Create("Action", buy), 12f, 42f);
@@ -258,7 +270,7 @@ namespace CellClicker.EditorTools
 
             TMP_Text costText = AddText(Create("Cost Text", cost).gameObject, "15", 50, Color.white, TmpSetup.PopupPreset);
 
-            var rowUI = row.gameObject.AddComponent<OrganismRowUI>();
+            var rowUI = row.gameObject.AddComponent<T>();
             Wire(rowUI, "icon", iconImage);
             Wire(rowUI, "nameText", nameText);
             Wire(rowUI, "infoText", infoText);

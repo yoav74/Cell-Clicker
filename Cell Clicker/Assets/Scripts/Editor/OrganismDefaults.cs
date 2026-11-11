@@ -16,26 +16,28 @@ namespace CellClicker.EditorTools
         {
             public readonly string Name;
             public readonly double Cost;
-            public readonly double DnaPerSecond;
+            public readonly double FirstDnaPerSecond;
+            public readonly double DnaPerSecondPerLevel;
             public readonly Color Tint;
 
-            public Entry(string name, double cost, double dnaPerSecond, Color tint)
+            public Entry(string name, double cost, double firstDnaPerSecond, double dnaPerSecondPerLevel, Color tint)
             {
                 Name = name;
                 Cost = cost;
-                DnaPerSecond = dnaPerSecond;
+                FirstDnaPerSecond = firstDnaPerSecond;
+                DnaPerSecondPerLevel = dnaPerSecondPerLevel;
                 Tint = tint;
             }
         }
 
-        // Classic idle curve: each Organism costs ~10x the last and pays back in a similar time.
+        // Each Organism costs ~10x the last and earns 4x; each level after the first adds half the first level.
         private static readonly Entry[] Entries =
         {
-            new Entry("Bacterium", 15, 0.1, new Color32(120, 235, 190, 255)),
-            new Entry("Amoeba", 100, 1, new Color32(140, 195, 255, 255)),
-            new Entry("Paramecium", 1100, 8, new Color32(255, 205, 110, 255)),
-            new Entry("Euglena", 12000, 47, new Color32(150, 240, 120, 255)),
-            new Entry("Volvox", 130000, 260, new Color32(205, 150, 255, 255)),
+            new Entry("Bacterium", 15, 1, 0.5, new Color32(120, 235, 190, 255)),
+            new Entry("Amoeba", 100, 4, 2, new Color32(140, 195, 255, 255)),
+            new Entry("Paramecium", 1100, 16, 8, new Color32(255, 205, 110, 255)),
+            new Entry("Euglena", 12000, 64, 32, new Color32(150, 240, 120, 255)),
+            new Entry("Volvox", 130000, 256, 128, new Color32(205, 150, 255, 255)),
         };
 
         public static OrganismDefinition[] GetOrCreate()
@@ -59,7 +61,8 @@ namespace CellClicker.EditorTools
                     so.FindProperty("saveId").stringValue = entry.Name.ToLowerInvariant();
                     so.FindProperty("tint").colorValue = entry.Tint;
                     so.FindProperty("baseCost").doubleValue = entry.Cost;
-                    so.FindProperty("dnaPerSecondPerLevel").doubleValue = entry.DnaPerSecond;
+                    so.FindProperty("firstLevelDnaPerSecond").doubleValue = entry.FirstDnaPerSecond;
+                    so.FindProperty("dnaPerSecondPerLevel").doubleValue = entry.DnaPerSecondPerLevel;
                     so.ApplyModifiedPropertiesWithoutUndo();
                 }
 

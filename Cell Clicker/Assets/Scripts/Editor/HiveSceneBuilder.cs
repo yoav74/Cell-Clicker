@@ -50,22 +50,25 @@ namespace CellClicker.EditorTools
             RemovePreviousBuild();
 
             // Game systems
-            var systems = new GameObject(SystemsName, typeof(GameBootstrap), typeof(DnaBank), typeof(OrganismRoster),
+            var systems = new GameObject(SystemsName, typeof(GameBootstrap), typeof(DnaBank), typeof(TapPower), typeof(OrganismRoster),
                 typeof(DnaGenerator), typeof(SaveSystem), typeof(ProgressSummary), typeof(OfflineEarningsCollector), typeof(ScreenFlow));
             Undo.RegisterCreatedObjectUndo(systems, "Build Hive Scene");
             var bank = systems.GetComponent<DnaBank>();
+            var tapPower = systems.GetComponent<TapPower>();
             var roster = systems.GetComponent<OrganismRoster>();
             var generator = systems.GetComponent<DnaGenerator>();
             var saveSystem = systems.GetComponent<SaveSystem>();
             var summary = systems.GetComponent<ProgressSummary>();
             var collector = systems.GetComponent<OfflineEarningsCollector>();
+            Wire(tapPower, "bank", bank);
+            Wire(tapPower, "definition", TapPowerDefaults.GetOrCreate());
             Wire(roster, "bank", bank);
             WireArray(roster, "definitions", OrganismDefaults.GetOrCreate());
             Wire(generator, "bank", bank);
             WireArray(generator, "sources", roster);
             Wire(summary, "bank", bank);
             Wire(summary, "generator", generator);
-            WireArray(saveSystem, "saveables", bank, roster, summary);
+            WireArray(saveSystem, "saveables", bank, tapPower, roster, summary);
             Wire(collector, "saveSystem", saveSystem);
             Wire(collector, "generator", generator);
             Wire(collector, "bank", bank);
@@ -131,18 +134,20 @@ namespace CellClicker.EditorTools
             var spawner = effects.gameObject.AddComponent<FloatingTextSpawner>();
 
             // Organisms button (bottom-left) and popup (above everything, built last)
-            OrganismShopBuilder.Build(canvas, safe, bank, roster);
+            OrganismShopBuilder.Build(canvas, safe, bank, tapPower, roster);
 
             var counter = canvasGo.AddComponent<DnaCounterUI>();
             var rate = canvasGo.AddComponent<DnaRateUI>();
 
             // Wire references
             Wire(hive, "bank", bank);
+            Wire(hive, "tapPower", tapPower);
             Wire(spawner, "hive", hive);
             Wire(spawner, "font", TmpSetup.DefaultFont);
             Wire(spawner, "material", TmpSetup.PopupPreset);
             Wire(counter, "bank", bank);
             Wire(counter, "hive", hive);
+            Wire(counter, "tapPower", tapPower);
             Wire(counter, "amountText", amount);
             Wire(counter, "perTapText", perTap);
             Wire(rate, "generator", generator);

@@ -22,8 +22,10 @@ namespace CellClicker.Organisms
         [SerializeField] private double baseCost = 15;
         [Tooltip("Each Organism Level costs this much more than the last (1.15 = +15%).")]
         [SerializeField] private float costGrowth = 1.15f;
-        [Tooltip("DNA/sec added by every Organism Level.")]
-        [SerializeField] private double dnaPerSecondPerLevel = 0.1;
+        [Tooltip("DNA/sec from recruiting it (Organism Level 1).")]
+        [SerializeField] private double firstLevelDnaPerSecond = 1;
+        [Tooltip("DNA/sec added by every Organism Level after the first.")]
+        [SerializeField] private double dnaPerSecondPerLevel = 0.5;
 
         public string DisplayName => displayName;
         public string SaveId => string.IsNullOrEmpty(saveId) ? name : saveId;
@@ -33,12 +35,14 @@ namespace CellClicker.Organisms
         /// <summary>DNA needed to go from <paramref name="level"/> to the next Organism Level.</summary>
         public double CostAt(int level) => Math.Floor(baseCost * Math.Pow(costGrowth, level));
 
-        public double DnaPerSecondAt(int level) => dnaPerSecondPerLevel * level;
+        public double DnaPerSecondAt(int level) =>
+            level <= 0 ? 0 : firstLevelDnaPerSecond + dnaPerSecondPerLevel * (level - 1);
 
         private void OnValidate()
         {
             baseCost = Math.Max(0, baseCost);
             costGrowth = Mathf.Max(1f, costGrowth);
+            firstLevelDnaPerSecond = Math.Max(0, firstLevelDnaPerSecond);
             dnaPerSecondPerLevel = Math.Max(0, dnaPerSecondPerLevel);
         }
     }

@@ -18,4 +18,5 @@ MonoBehaviour:
   tint: {r: 0.5882353, g: 0.9411765, b: 0.47058824, a: 1}
   baseCost: 12000
   costGrowth: 1.15
-  dnaPerSecondPerLevel: 47
+  firstLevelDnaPerSecond: 64
+  dnaPerSecondPerLevel: 32

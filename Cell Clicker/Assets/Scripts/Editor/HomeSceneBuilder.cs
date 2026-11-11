@@ -72,7 +72,7 @@ namespace CellClicker.EditorTools
 
             RectTransform safe = Create("Safe Area", canvas);
             Stretch(safe);
-            safe.gameObject.AddComponent<SafeArea>();
+            safe.gameObject.AddComponent<CellClicker.UI.SafeArea>(); // full name: Unity has its own SafeArea type
 
             RectTransform title = PinTop(Create("Title", safe), 120f, 200f, SidePadding, SidePadding);
             AddText(title.gameObject, "Cell Clicker", 150, Color.white, TmpSetup.GlowPreset);
@@ -106,16 +106,17 @@ namespace CellClicker.EditorTools
 
         private static GameObject BuildAwayCard(Transform safe, out TMP_Text amount, out TMP_Text detail)
         {
-            RectTransform card = Pin(Create("Away Card", safe), new Vector2(0.5f, 0f), new Vector2(860f, 250f), new Vector2(0f, 330f));
+            RectTransform card = Pin(Create("Away Card", safe), new Vector2(0.5f, 0f), new Vector2(860f, 270f), new Vector2(0f, 330f));
             AddRounded(card.gameObject, CardColor, 40f);
 
             RectTransform heading = PinTop(Create("Heading", card), 24f, 56f, 30f, 30f);
             AddText(heading.gameObject, "While you were away", 44, Subtle, TmpSetup.SoftShadowPreset);
 
-            RectTransform amountRect = PinTop(Create("Amount", card), 84f, 96f, 30f, 30f);
+            // Lilita One lines are ~1.15x the font size; a box that is too short hides the text completely.
+            RectTransform amountRect = PinTop(Create("Amount", card), 80f, 112f, 30f, 30f);
             amount = AddText(amountRect.gameObject, "+0 DNA", 84, Gold, TmpSetup.PopupPreset);
 
-            RectTransform detailRect = PinTop(Create("Detail", card), 182f, 48f, 30f, 30f);
+            RectTransform detailRect = PinTop(Create("Detail", card), 196f, 48f, 30f, 30f);
             detail = AddText(detailRect.gameObject, "in 0m away", 36, Subtle, TmpSetup.SoftShadowPreset);
 
             return card.gameObject;

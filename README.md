@@ -18,3 +18,9 @@ Add Bigger units that can mine more DNA, give each unit upgrades and have booste
 | `pitch.md` | One-page pitch of the game |
 | `DECISIONS.md` | Every real decision the team made, and why |
 | `AGENTS.md` | Context for AI coding tools: architecture, rules, conventions |
+
+
+
+## Task 2 Links:
+1. Simulator Screenshots - https://imgur.com/a/rxZsrbP
+2. Phone Video - https://www.youtube.com/shorts/boJ_uWDqo5M

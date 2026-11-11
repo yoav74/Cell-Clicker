@@ -56,6 +56,7 @@ namespace CellClicker.EditorTools
 
                     var so = new SerializedObject(definition);
                     so.FindProperty("displayName").stringValue = entry.Name;
+                    so.FindProperty("saveId").stringValue = entry.Name.ToLowerInvariant();
                     so.FindProperty("tint").colorValue = entry.Tint;
                     so.FindProperty("baseCost").doubleValue = entry.Cost;
                     so.FindProperty("dnaPerSecondPerLevel").doubleValue = entry.DnaPerSecond;

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 05 Volvox
   m_EditorClassIdentifier: Assembly-CSharp::CellClicker.Organisms.OrganismDefinition
   displayName: Volvox
+  saveId: volvox
   icon: {fileID: 0}
   tint: {r: 0.8039216, g: 0.5882353, b: 1, a: 1}
   baseCost: 130000

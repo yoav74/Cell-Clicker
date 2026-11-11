@@ -11,6 +11,8 @@ namespace CellClicker.Organisms
     public class OrganismDefinition : ScriptableObject
     {
         [SerializeField] private string displayName = "Organism";
+        [Tooltip("Stable name in save files. Never change it after release, or players lose this Organism's levels. Empty = the asset name.")]
+        [SerializeField] private string saveId;
         [Tooltip("Optional. Empty = the code-drawn placeholder icon, tinted.")]
         [SerializeField] private Sprite icon;
         [SerializeField] private Color tint = Color.white;
@@ -24,6 +26,7 @@ namespace CellClicker.Organisms
         [SerializeField] private double dnaPerSecondPerLevel = 0.1;
 
         public string DisplayName => displayName;
+        public string SaveId => string.IsNullOrEmpty(saveId) ? name : saveId;
         public Sprite Icon => icon;
         public Color Tint => tint;
 

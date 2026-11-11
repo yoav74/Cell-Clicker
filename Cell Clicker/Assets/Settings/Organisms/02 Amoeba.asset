@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 02 Amoeba
   m_EditorClassIdentifier: Assembly-CSharp::CellClicker.Organisms.OrganismDefinition
   displayName: Amoeba
+  saveId: amoeba
   icon: {fileID: 0}
   tint: {r: 0.54901963, g: 0.7647059, b: 1, a: 1}
   baseCost: 100

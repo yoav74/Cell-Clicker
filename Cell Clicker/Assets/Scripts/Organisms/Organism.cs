@@ -1,3 +1,5 @@
+using System;
+
 namespace CellClicker.Organisms
 {
     /// <summary>The player's copy of one Organism: which definition it is and its Organism Level.</summary>
@@ -19,5 +21,8 @@ namespace CellClicker.Organisms
         public double NextLevelGain => Definition.DnaPerSecondAt(Level + 1) - DnaPerSecond;
 
         internal void LevelUp() => Level++;
+
+        /// <summary>Only for loading a save.</summary>
+        internal void SetLevel(int level) => Level = Math.Max(0, level);
     }
 }

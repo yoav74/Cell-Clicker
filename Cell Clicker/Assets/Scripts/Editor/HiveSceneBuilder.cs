@@ -35,7 +35,7 @@ namespace CellClicker.EditorTools
         private const float HintSideInset = 220f; // keeps the centered hint clear of the Organisms button
         private const float SidePadding = 40f;
 
-        private static readonly Color Background = new Color32(10, 22, 34, 255);
+        internal static readonly Color Background = new Color32(10, 22, 34, 255);
         private static readonly Color TapColor = new Color32(120, 220, 190, 255);
         private static readonly Color RateColor = new Color32(255, 205, 100, 255);
         private static readonly Color SubtleColor = new Color32(150, 180, 190, 200);
@@ -50,25 +50,29 @@ namespace CellClicker.EditorTools
             RemovePreviousBuild();
 
             // Game systems
-            var systems = new GameObject(SystemsName, typeof(GameBootstrap), typeof(DnaBank), typeof(OrganismRoster), typeof(DnaGenerator));
+            var systems = new GameObject(SystemsName, typeof(GameBootstrap), typeof(DnaBank), typeof(OrganismRoster),
+                typeof(DnaGenerator), typeof(SaveSystem), typeof(ProgressSummary), typeof(OfflineEarningsCollector), typeof(ScreenFlow));
             Undo.RegisterCreatedObjectUndo(systems, "Build Hive Scene");
             var bank = systems.GetComponent<DnaBank>();
             var roster = systems.GetComponent<OrganismRoster>();
             var generator = systems.GetComponent<DnaGenerator>();
+            var saveSystem = systems.GetComponent<SaveSystem>();
+            var summary = systems.GetComponent<ProgressSummary>();
+            var collector = systems.GetComponent<OfflineEarningsCollector>();
             Wire(roster, "bank", bank);
             WireArray(roster, "definitions", OrganismDefaults.GetOrCreate());
             Wire(generator, "bank", bank);
             WireArray(generator, "sources", roster);
+            Wire(summary, "bank", bank);
+            Wire(summary, "generator", generator);
+            WireArray(saveSystem, "saveables", bank, roster, summary);
+            Wire(collector, "saveSystem", saveSystem);
+            Wire(collector, "generator", generator);
+            Wire(collector, "bank", bank);
+            Wire(collector, "settings", OfflineEarningsDefaults.GetOrCreate());
 
-            // Root canvas, portrait 1080x1920 reference, scaled by width so it fits every phone width
-            var canvasGo = new GameObject(CanvasName, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            var canvasGo = CreatePortraitCanvas(CanvasName);
             Undo.RegisterCreatedObjectUndo(canvasGo, "Build Hive Scene");
-            canvasGo.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
-            var scaler = canvasGo.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1080, 1920);
-            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 0f;
             var canvas = canvasGo.transform;
 
             // Background fills the whole screen, including behind the notch
@@ -86,6 +90,10 @@ namespace CellClicker.EditorTools
             header.gameObject.AddComponent<Canvas>();
             TMP_Text amount = BuildAmountRow(header);
             BuildStatsPill(header, out TMP_Text perTap, out TMP_Text perSecond);
+
+            // Back to Home, top-left: rarely needed, so it sits outside the thumb zone (course guideline).
+            Button home = BuildIconButton(safe, "Home Button", "<", Vector2.up, new Vector2(SidePadding, -28f));
+            UnityEditor.Events.UnityEventTools.AddPersistentListener(home.onClick, systems.GetComponent<ScreenFlow>().Back);
 
             // Play area between header and bottom strip
             var playArea = Create("Play Area", safe);
@@ -203,7 +211,7 @@ namespace CellClicker.EditorTools
             }
         }
 
-        private static void EnsureEventSystem()
+        internal static void EnsureEventSystem()
         {
             var eventSystem = Object.FindAnyObjectByType<EventSystem>();
             if (eventSystem == null)
@@ -221,7 +229,7 @@ namespace CellClicker.EditorTools
         }
 
         // The game is all overlay UI, so the camera has nothing to draw. Skip 3D rendering and post-processing.
-        private static void SetupCamera()
+        internal static void SetupCamera()
         {
             Camera cam = Camera.main;
             if (cam == null) return;

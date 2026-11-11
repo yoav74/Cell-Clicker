@@ -143,8 +143,8 @@ namespace CellClicker.EditorTools
             RectTransform subtitle = PinTop(Create("Subtitle", sheet), 144f, 50f, 58f, 200f);
             AddText(subtitle.gameObject, "Recruit Organisms to earn DNA/sec", 36, Subtle, TmpSetup.SoftShadowPreset, TextAlignmentOptions.Left);
 
-            RectTransform close = Pin(Create("Close Button", sheet), Vector2.one, new Vector2(120f, 120f), new Vector2(-36f, -40f));
-            Image closeImage = AddRounded(close.gameObject, new Color(1f, 1f, 1f, 0.1f), 60f, raycast: true);
+            RectTransform close = Pin(Create("Close Button", sheet), Vector2.one, new Vector2(MinTapSize, MinTapSize), new Vector2(-36f, -30f));
+            Image closeImage = AddRounded(close.gameObject, new Color(1f, 1f, 1f, 0.1f), MinTapSize * 0.5f, raycast: true);
             var closeButton = close.gameObject.AddComponent<Button>();
             closeButton.targetGraphic = closeImage;
             RectTransform closeMark = Create("Mark", close);

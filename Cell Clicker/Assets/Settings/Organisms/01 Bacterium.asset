@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 01 Bacterium
   m_EditorClassIdentifier: Assembly-CSharp::CellClicker.Organisms.OrganismDefinition
   displayName: Bacterium
+  saveId: bacterium
   icon: {fileID: 0}
   tint: {r: 0.47058824, g: 0.92156863, b: 0.74509805, a: 1}
   baseCost: 15

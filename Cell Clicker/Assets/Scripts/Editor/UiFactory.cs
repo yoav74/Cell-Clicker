@@ -11,6 +11,39 @@ namespace CellClicker.EditorTools
         // The Pill placeholder sprite has 32 px corners; Image.pixelsPerUnitMultiplier rescales them.
         private const float PillCornerPixels = 32f;
 
+        // Course minimum for a thumb: 140 x 140 at the 1080 x 1920 reference.
+        public const float MinTapSize = 140f;
+
+        /// <summary>
+        /// Overlay canvas, portrait 1080x1920 reference. Matches width (0) instead of the course's 0.5:
+        /// on tall phones 0.5 would shrink the usable width below 1080 and clip the header and shop rows.
+        /// </summary>
+        public static GameObject CreatePortraitCanvas(string name)
+        {
+            var canvasGo = new GameObject(name, typeof(Canvas), typeof(UnityEngine.UI.CanvasScaler), typeof(UnityEngine.UI.GraphicRaycaster));
+            canvasGo.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+            var scaler = canvasGo.GetComponent<UnityEngine.UI.CanvasScaler>();
+            scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1080, 1920);
+            scaler.screenMatchMode = UnityEngine.UI.CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scaler.matchWidthOrHeight = 0f;
+            return canvasGo;
+        }
+
+        /// <summary>A round, 140x140 button with a text glyph, pinned to <paramref name="anchor"/> of its parent.</summary>
+        public static UnityEngine.UI.Button BuildIconButton(Transform parent, string name, string glyph, Vector2 anchor, Vector2 position)
+        {
+            RectTransform rect = Pin(Create(name, parent), anchor, new Vector2(MinTapSize, MinTapSize), position);
+            UnityEngine.UI.Image image = AddRounded(rect.gameObject, new Color(1f, 1f, 1f, 0.12f), MinTapSize * 0.5f, raycast: true);
+            var button = rect.gameObject.AddComponent<UnityEngine.UI.Button>();
+            button.targetGraphic = image;
+
+            RectTransform mark = Create("Glyph", rect);
+            Stretch(mark);
+            AddText(mark.gameObject, glyph, 64, Color.white, TmpSetup.PopupPreset);
+            return button;
+        }
+
         public static RectTransform Create(string name, Transform parent)
         {
             var go = new GameObject(name, typeof(RectTransform));

@@ -7,7 +7,7 @@ namespace CellClicker.Core
     /// Holds the player's DNA. Everything that earns DNA goes through here,
     /// and the UI listens to <see cref="Changed"/> to update itself.
     /// </summary>
-    public class DnaBank : MonoBehaviour
+    public class DnaBank : MonoBehaviour, ISaveable
     {
         [SerializeField] private double startingDna = 0;
 
@@ -15,6 +15,8 @@ namespace CellClicker.Core
 
         /// <summary>Fired with the new total whenever DNA changes.</summary>
         public event Action<double> Changed;
+
+        public string SaveKey => "dna";
 
         private void Awake()
         {
@@ -39,6 +41,23 @@ namespace CellClicker.Core
             Amount -= cost;
             Changed?.Invoke(Amount);
             return true;
+        }
+
+        public string CaptureState() => JsonUtility.ToJson(new State { amount = Amount });
+
+        public void RestoreState(string json)
+        {
+            double saved = JsonUtility.FromJson<State>(json).amount;
+            if (!double.IsFinite(saved) || saved < 0) return; // a broken value must never wipe or poison the bank
+
+            Amount = saved;
+            Changed?.Invoke(Amount);
+        }
+
+        [Serializable]
+        private class State
+        {
+            public double amount;
         }
     }
 }

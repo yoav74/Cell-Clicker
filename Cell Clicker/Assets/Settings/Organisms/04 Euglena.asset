@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: 04 Euglena
   m_EditorClassIdentifier: Assembly-CSharp::CellClicker.Organisms.OrganismDefinition
   displayName: Euglena
+  saveId: euglena
   icon: {fileID: 0}
   tint: {r: 0.5882353, g: 0.9411765, b: 0.47058824, a: 1}
   baseCost: 12000

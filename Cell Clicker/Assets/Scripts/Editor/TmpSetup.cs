@@ -1,22 +1,29 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.TextCore.LowLevel;
 
 namespace CellClicker.EditorTools
 {
     /// <summary>
     /// TextMeshPro helpers for the editor tools: imports TMP Essential Resources when missing,
-    /// gives the default font, and creates the game's text material presets.
+    /// creates the game font asset (Lilita One) and the game's text material presets.
     /// </summary>
     public static class TmpSetup
     {
-        private const string FontResourcePath = "Fonts & Materials/LiberationSans SDF";
+        private const string FallbackFontResourcePath = "Fonts & Materials/LiberationSans SDF";
         private const string MobileShaderName = "TextMeshPro/Mobile/Distance Field";
         private const string PresetFolder = "Assets/Art/Fonts";
 
-        // Preset names must start with the font name so TMP's Inspector lists them in its "Material Preset" dropdown.
-        private const string PresetPrefix = "LiberationSans SDF - ";
+        private const string GameFontSource = "Assets/Art/Fonts/LilitaOne-Regular.ttf";
+        private const string GameFontName = "LilitaOne SDF";
+        private const string GameFontPath = "Assets/Art/Fonts/" + GameFontName + ".asset";
+
+        // Added to the atlas up front so the UI shows right away; anything else is added on demand.
+        private const string PrefilledCharacters =
+            " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
         /// <summary>
         /// Runs <paramref name="action"/> now if TMP Essential Resources exist, otherwise imports them
@@ -62,7 +69,10 @@ namespace CellClicker.EditorTools
             TMP_PackageResourceImporter.ImportResources(importEssentials: true, importExamples: false, interactive: false);
         }
 
-        public static TMP_FontAsset DefaultFont => Resources.Load<TMP_FontAsset>(FontResourcePath);
+        /// <summary>The game font (Lilita One), created on first use. Falls back to LiberationSans if the .ttf is missing.</summary>
+        public static TMP_FontAsset DefaultFont => GetOrCreateGameFont() ?? FallbackFont;
+
+        private static TMP_FontAsset FallbackFont => Resources.Load<TMP_FontAsset>(FallbackFontResourcePath);
 
         /// <summary>Big soft teal glow + thin dark outline, for the DNA total.</summary>
         public static Material GlowPreset => GetOrCreatePreset("DNA Glow", m =>
@@ -84,23 +94,70 @@ namespace CellClicker.EditorTools
             SetUnderlay(m, new Color32(0, 0, 0, 110), new Vector2(0.4f, -0.4f), dilate: 0f, softness: 0.4f);
         });
 
-        // Created once; after that the asset is reused so Inspector tweaks are kept.
+        // Dynamic SDF asset: sharp at any size, adds missing glyphs (e.g. other languages) on demand.
+        private static TMP_FontAsset GetOrCreateGameFont()
+        {
+            var existing = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(GameFontPath);
+            if (existing != null) return existing;
+
+            var source = AssetDatabase.LoadAssetAtPath<Font>(GameFontSource);
+            if (source == null)
+            {
+                Debug.LogWarning($"Cell Clicker: {GameFontSource} not found, using LiberationSans. Is Git LFS installed?");
+                return null;
+            }
+
+            TMP_FontAsset font = TMP_FontAsset.CreateFontAsset(source, 72, 9, GlyphRenderMode.SDFAA, 1024, 1024);
+            if (font == null)
+            {
+                Debug.LogError($"Cell Clicker: could not create a font asset from {GameFontSource}.");
+                return null;
+            }
+
+            // Same steps as TMP's own "Create > TextMeshPro > Font Asset": the atlas and material live inside the asset.
+            font.name = GameFontName;
+            AssetDatabase.CreateAsset(font, GameFontPath);
+            font.atlasTextures[0].name = GameFontName + " Atlas";
+            AssetDatabase.AddObjectToAsset(font.atlasTextures[0], font);
+            font.material.name = GameFontName + " Material";
+            AssetDatabase.AddObjectToAsset(font.material, font);
+
+            font.TryAddCharacters(PrefilledCharacters, out string missing);
+            if (!string.IsNullOrEmpty(missing)) Debug.LogWarning($"Cell Clicker: {GameFontName} has no glyphs for: {missing}");
+
+            TMP_FontAsset fallback = FallbackFont;
+            if (fallback != null) font.fallbackFontAssetTable = new List<TMP_FontAsset> { fallback };
+
+            EditorUtility.SetDirty(font);
+            AssetDatabase.SaveAssets();
+            return font;
+        }
+
+        // Created once per font; after that the asset is reused so Inspector tweaks are kept.
+        // The name starts with the font name so TMP's Inspector lists it in the "Material Preset" dropdown.
         private static Material GetOrCreatePreset(string name, Action<Material> configure)
         {
-            string path = $"{PresetFolder}/{PresetPrefix}{name}.mat";
+            TMP_FontAsset font = DefaultFont;
+            if (font == null)
+            {
+                Debug.LogError("Cell Clicker: no TMP font found. Are TMP Essential Resources imported?");
+                return null;
+            }
+
+            string presetName = $"{font.name} - {name}";
+            string path = $"{PresetFolder}/{presetName}.mat";
             var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (existing != null) return existing;
 
-            TMP_FontAsset font = DefaultFont;
             Shader mobile = Shader.Find(MobileShaderName);
-            if (font == null || mobile == null)
+            if (mobile == null)
             {
-                Debug.LogError("Cell Clicker: TMP font or mobile shader missing. Are TMP Essential Resources imported?");
+                Debug.LogError("Cell Clicker: TMP mobile shader missing. Are TMP Essential Resources imported?");
                 return null;
             }
 
             // Copy the font's material so the atlas texture and SDF settings match, then switch to the cheaper mobile shader.
-            var material = new Material(font.material) { name = PresetPrefix + name, shader = mobile };
+            var material = new Material(font.material) { name = presetName, shader = mobile };
             configure(material);
             ShaderUtilities.UpdateShaderRatios(material);
 

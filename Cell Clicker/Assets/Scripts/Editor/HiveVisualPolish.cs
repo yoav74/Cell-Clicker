@@ -9,15 +9,14 @@ namespace CellClicker.EditorTools
 {
     /// <summary>
     /// Menu: Cell Clicker > Apply Visual Polish.
-    /// Adds the flashy layer (background gradient and motes, hive aura, tap bursts, header panel,
-    /// helix icons, pulsing hint) to an existing hive scene. It only adds what's missing and never
+    /// Adds the flashy layer (background gradient and motes, hive aura, tap bursts, pulsing hint)
+    /// to an existing hive scene. It only adds what's missing and never
     /// deletes anything, so it's safe to run again and keeps your Inspector tweaks.
     /// </summary>
     public static class HiveVisualPolish
     {
         private static readonly Color GlowColor = new Color32(92, 225, 181, 90);
         private static readonly Color RaysColor = new Color32(200, 255, 235, 30);
-        private static readonly Color PanelColor = new Color32(255, 255, 255, 14);
 
         [MenuItem("Cell Clicker/Apply Visual Polish")]
         public static void ApplyFromMenu()
@@ -40,13 +39,11 @@ namespace CellClicker.EditorTools
 
             Transform canvas = canvasGo.transform;
             Transform safe = Require(canvas, "Safe Area");
-            Transform header = Require(safe, "Header");
             Transform playArea = Require(safe, "Play Area");
             Transform hint = Require(safe, "Hint");
             Transform effects = Require(canvas, "Effects Layer");
             Transform background = Require(canvas, "Background");
-            Transform amount = Require(header, "DNA Amount");
-            if (safe == null || header == null || playArea == null || hint == null || effects == null || background == null || amount == null)
+            if (safe == null || playArea == null || hint == null || effects == null || background == null)
             {
                 return false;
             }
@@ -94,21 +91,6 @@ namespace CellClicker.EditorTools
             SetKind(GetOrAdd<ProceduralImage>(hive.gameObject), ProceduralSpriteKind.Cell);
             Wire(GetOrAdd<HiveSquish>(hive.gameObject), "hive", hive);
 
-            // Header: glass panel behind the number, helix icons around the label (the number glow is a TMP material)
-            RectTransform panel = FindOrCreate(header, "Amount Panel", 0);
-            panel.anchorMin = panel.anchorMax = new Vector2(0.5f, 1f);
-            panel.pivot = new Vector2(0.5f, 1f);
-            panel.sizeDelta = new Vector2(860f, 230f);
-            panel.anchoredPosition = new Vector2(0f, -88f);
-            var panelImage = GetOrAdd<UnityEngine.UI.Image>(panel.gameObject);
-            panelImage.type = UnityEngine.UI.Image.Type.Sliced;
-            panelImage.color = PanelColor;
-            panelImage.raycastTarget = false;
-            SetKind(GetOrAdd<ProceduralImage>(panel.gameObject), ProceduralSpriteKind.Pill);
-
-            CreateHelix(header, "Helix Left", -120f);
-            CreateHelix(header, "Helix Right", 120f);
-
             // Pulsing hint that disappears after the first tap
             var hintPrompt = GetOrAdd<HintPrompt>(hint.gameObject);
             Wire(hintPrompt, "bank", bank);
@@ -119,18 +101,6 @@ namespace CellClicker.EditorTools
 
             EditorSceneManager.MarkSceneDirty(canvasGo.scene);
             return true;
-        }
-
-        private static void CreateHelix(Transform header, string name, float x)
-        {
-            RectTransform helix = FindOrCreate(header, name, 1);
-            helix.anchorMin = helix.anchorMax = new Vector2(0.5f, 1f);
-            helix.pivot = new Vector2(0.5f, 1f);
-            helix.sizeDelta = new Vector2(54f, 72f);
-            helix.anchoredPosition = new Vector2(x, -38f);
-            var image = GetOrAdd<UnityEngine.UI.Image>(helix.gameObject);
-            image.raycastTarget = false;
-            SetKind(GetOrAdd<ProceduralImage>(helix.gameObject), ProceduralSpriteKind.Helix);
         }
 
         // A non-interactive image whose anchors reach past its parent (e.g. -0.3..1.3 = 160% of the hive).

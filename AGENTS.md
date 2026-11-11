@@ -7,9 +7,9 @@ If you use Claude Code, also add a `CLAUDE.md` containing one line: `@AGENTS.md`
 **Cell Clicker** is a hybrid-casual idle tap game for Android, played in portrait with one thumb. The player starts as a single cell and taps a DNA Hive to earn DNA. DNA is spent on upgrading DNA per tap, recruiting organisms that generate DNA on their own, and unlocking upgrades, abilities and boosters. Achievements (total DNA earned, most DNA held, DNA/sec records) grant generation multipliers. At DNA/sec milestones the hive's theme evolves: cell → microscopic creatures → bugs → animals → humans (maybe space and aliens). DNA keeps coming in at a slower rate while the app is closed. Every day the player gets 3 free Super-Boosters (+300% generation), and can earn more by watching ads. One booster scales with skill: the more taps in the 5 seconds after activating it, the bigger the boost. Sessions can be a quick minute or a long tapping session. The fun comes from fast-growing numbers, VFX that sell the feeling of making lots of DNA, and seeing all of the player's units on screen.
 
 ## Tech
-- Engine: Unity 6 LTS, C#
+- Engine: Unity 6000.6.7f1, C#
 - Target: Android (portrait)
-- UI: uGUI + TextMeshPro (in `com.unity.ugui` 2.0; TMP Essential Resources in `Assets/TextMesh Pro/`), URP, new Input System
+- UI: uGUI + TextMeshPro (in `com.unity.ugui` 2.6; TMP Essential Resources in `Assets/TextMesh Pro/`), URP, new Input System
 - [Add packages and services as you add them]
 
 ## Architecture
@@ -34,7 +34,7 @@ If you use Claude Code, also add a `CLAUDE.md` containing one line: `@AGENTS.md`
 Review the planned change against this checklist first, then write it. In the reply, briefly say how it holds up (and what you changed because of it).
 
 1. **Correct**
-   - Does it actually work in Unity 6 with this project's setup (new Input System only, URP, uGUI)?
+   - Does it actually work in Unity 6000.6 with this project's setup (new Input System only, URP, uGUI)?
    - Edge cases covered: null references, 0 or huge numbers (DNA is `double`), multi-touch, app pause/resume.
    - Compiles with no new errors or warnings (apart from CS0649 on `[SerializeField]` fields).
 2. **Readable**

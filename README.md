@@ -8,7 +8,7 @@ In the game the player starts as a singular cell where he can create DNA by clic
 Add Bigger units that can mine more DNA, give each unit upgrades and have boosters to increase the DNA further.
 
 ## How to open and build
-1. Open the project in Unity 6 LTS (the exact version is on Moodle).
+1. Open the project in Unity 6000.6.7f1.
 2. File → Build Profiles → Android → Switch Platform.
 3. Build and run on an Android phone.
 

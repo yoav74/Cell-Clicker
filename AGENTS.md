@@ -13,17 +13,20 @@ If you use Claude Code, also add a `CLAUDE.md` containing one line: `@AGENTS.md`
 - [Add packages and services as you add them]
 
 ## Architecture
-- Unity project lives in `Cell Clicker/`. Scripts in `Assets/Scripts/{Core,Hive,UI,Editor}`, namespaces `CellClicker.*`.
-- `DnaBank` (Core) owns the DNA total; everything earns through `Add()`, UI listens to `Changed`.
+- Unity project lives in `Cell Clicker/`. Scripts in `Assets/Scripts/{Core,Hive,Organisms,UI,Editor}`, namespaces `CellClicker.*`.
+- `DnaBank` (Core) owns the DNA total; everything earns through `Add()` and spends through `TrySpend()`, UI listens to `Changed` (fires every frame while DNA/sec flows, so listeners must be cheap).
+- DNA/sec: anything that produces it implements `IDnaSource`; `DnaGenerator` sums the sources and adds the DNA each frame. UI reads the total from `DnaGenerator`.
+- Organisms: `OrganismDefinition` ScriptableObjects (name, tint, cost curve, DNA/sec per Organism Level) in `Assets/Settings/Organisms`; `OrganismRoster` owns the player's `Organism`s, levels them up and is an `IDnaSource`. New Organism = new asset.
 - `DnaHive` (Hive) is a uGUI Image; tapping it (`IPointerDownHandler`) adds `dnaPerTap` and raises `Tapped(HiveTap)`. It does nothing visual.
 - Tap feedback = subclasses of `HiveTapFeedback` (subscribe to `Tapped`): `HiveSquish`, `HiveAura` (glow + rays, tap "energy"), `FloatingTextSpawner` ("+1" popups), `TapBurstFeedback` (ring + particles). New effect = new subclass; don't touch `DnaHive`.
-- `DnaCounterUI` (rolling, flashing total), `HintPrompt`, `BackgroundMotes` (UI).
-- Text: TextMeshPro only (`TextMeshProUGUI`; scripts reference `TMP_Text`). Font: LiberationSans SDF. Styles are TMP material presets in `Assets/Art/Fonts/` (DNA Glow, Popup, Soft Shadow) on the Mobile SDF shader, created by `Editor/TmpSetup.cs`. Fade text with `canvasRenderer.SetAlpha`, not `color` (no mesh rebuild). Don't use uGUI `Outline`/`Shadow` on TMP.
+- `DnaCounterUI` (rolling total, flashes on tap), `DnaRateUI` (DNA/sec), `HintPrompt`, `BackgroundMotes` (UI).
+- Popups: `PopupPanel` is a bottom sheet (slide up, dim backdrop, closes on backdrop/X/Android back). The Organisms popup = `PopupPanel` + `OrganismShopUI` (one `OrganismRowUI` per Organism, cloned from a template row). `OrganismShopButton` (bottom-left, below the play area) opens it and shows a badge while something is affordable.
+- Text: TextMeshPro only (`TextMeshProUGUI`; scripts reference `TMP_Text`). Font: Lilita One (`Assets/Art/Fonts/LilitaOne-Regular.ttf`, OFL licence) as a dynamic `LilitaOne SDF` asset with LiberationSans as fallback. Styles are TMP material presets in `Assets/Art/Fonts/` (DNA Glow, Popup, Soft Shadow) on the Mobile SDF shader. `Editor/TmpSetup.cs` creates the font asset and presets. Fade text with `canvasRenderer.SetAlpha`, not `color` (no mesh rebuild). Don't use uGUI `Outline`/`Shadow` on TMP.
 - Placeholder art is drawn in code: `ProceduralSprites` (cached) + `ProceduralImage` (sets `overrideSprite`, also in edit mode, never saved). Replace with real sprites later.
 - **Cell Clicker > Apply Visual Polish** (`Editor/HiveVisualPolish.cs`) adds the visual layer to an existing scene without deleting anything.
 - Input: new Input System only (`InputSystemUIInputModule` on the EventSystem).
-- Scene setup: menu **Cell Clicker > Build Hive Scene** (`Editor/HiveSceneBuilder.cs`) builds and wires the scene (rerun replaces it).
-- Layout: portrait 1080x1920 reference, scaled by width. `SafeArea` holds Header (top), Play Area (hive fits inside via AspectRatioFitter) and Hint (bottom).
+- Scene setup: menu **Cell Clicker > Build Hive Scene** (`Editor/HiveSceneBuilder.cs`, with `OrganismShopBuilder`, `OrganismDefaults` and the `UiFactory` helpers) builds and wires the scene (rerun replaces it).
+- Layout: portrait 1080x1920 reference, scaled by width. `SafeArea` holds Header (top: helix icon + DNA total, Tap Power / DNA/sec pill), Play Area (hive fits inside via AspectRatioFitter) and a bottom strip (Organisms button bottom-left, Hint). Nothing tappable overlaps the Play Area.
 - Mobile perf: hive, aura, header, motes and effects each have their own nested Canvas; popups and burst pieces are pooled; `GameBootstrap` sets 60 FPS; camera renders nothing (UI is overlay).
 - Orientation: portrait only, set via **Cell Clicker > Apply Portrait Settings** (`Editor/MobileProjectSettings.cs`).
 

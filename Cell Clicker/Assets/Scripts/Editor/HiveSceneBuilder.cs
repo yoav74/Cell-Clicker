@@ -1,5 +1,6 @@
 using CellClicker.Core;
 using CellClicker.Hive;
+using CellClicker.Organisms;
 using CellClicker.UI;
 using TMPro;
 using UnityEditor;
@@ -9,31 +10,36 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using static CellClicker.EditorTools.UiFactory;
 
 namespace CellClicker.EditorTools
 {
     /// <summary>
     /// Menu: Cell Clicker > Build Hive Scene.
-    /// Builds the DNA Hive, HUD and popups in the open scene and wires all references.
+    /// Builds the DNA Hive, HUD, Organisms popup and game systems in the open scene and wires all references.
     /// Running it again replaces the previous build. Tweak everything in the Inspector afterwards.
     ///
     /// Layout (portrait, inside the safe area):
-    ///   Header    - fixed height at the top (DNA label, total, per tap)
-    ///   Play Area - everything between header and hint; the hive scales to fit it, so it never covers the HUD
-    ///   Hint      - fixed at the bottom
+    ///   Header      - fixed height at the top (DNA total with a helix icon, Tap Power and DNA/sec pill)
+    ///   Play Area   - everything between header and bottom strip; the hive scales to fit it, so it never covers the HUD
+    ///   Bottom strip - Organisms button (bottom-left) and the hint, below the play area so they can't steal hive taps
     /// </summary>
     public static class HiveSceneBuilder
     {
         private const string CanvasName = "Hive Canvas";
         private const string SystemsName = "Game Systems";
 
-        private const float HeaderHeight = 380f;
-        private const float HintHeight = 200f;
+        private const float HeaderHeight = 330f;
+        private const float BottomStripHeight = 230f;
+        private const float PlayAreaGap = 24f;
+        private const float HintSideInset = 220f; // keeps the centered hint clear of the Organisms button
         private const float SidePadding = 40f;
 
         private static readonly Color Background = new Color32(10, 22, 34, 255);
-        private static readonly Color LabelColor = new Color32(120, 220, 190, 255);
+        private static readonly Color TapColor = new Color32(120, 220, 190, 255);
+        private static readonly Color RateColor = new Color32(255, 205, 100, 255);
         private static readonly Color SubtleColor = new Color32(150, 180, 190, 200);
+        private static readonly Color PillColor = new Color(0f, 0f, 0f, 0.3f);
 
         [MenuItem("Cell Clicker/Build Hive Scene")]
         public static void Build() => TmpSetup.RunWhenReady(BuildNow);
@@ -44,9 +50,15 @@ namespace CellClicker.EditorTools
             RemovePreviousBuild();
 
             // Game systems
-            var systems = new GameObject(SystemsName, typeof(GameBootstrap), typeof(DnaBank));
+            var systems = new GameObject(SystemsName, typeof(GameBootstrap), typeof(DnaBank), typeof(OrganismRoster), typeof(DnaGenerator));
             Undo.RegisterCreatedObjectUndo(systems, "Build Hive Scene");
             var bank = systems.GetComponent<DnaBank>();
+            var roster = systems.GetComponent<OrganismRoster>();
+            var generator = systems.GetComponent<DnaGenerator>();
+            Wire(roster, "bank", bank);
+            WireArray(roster, "definitions", OrganismDefaults.GetOrCreate());
+            Wire(generator, "bank", bank);
+            WireArray(generator, "sources", roster);
 
             // Root canvas, portrait 1080x1920 reference, scaled by width so it fits every phone width
             var canvasGo = new GameObject(CanvasName, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -60,40 +72,30 @@ namespace CellClicker.EditorTools
             var canvas = canvasGo.transform;
 
             // Background fills the whole screen, including behind the notch
-            var bg = CreateUI("Background", canvas);
+            var bg = Create("Background", canvas);
             Stretch(bg);
-            var bgImage = bg.gameObject.AddComponent<Image>();
-            bgImage.color = Background;
-            bgImage.raycastTarget = false;
+            AddImage(bg.gameObject, Background);
 
             // Everything interactive/readable sits inside the safe area
-            var safe = CreateUI("Safe Area", canvas);
+            var safe = Create("Safe Area", canvas);
             Stretch(safe);
-            safe.gameObject.AddComponent<SafeArea>();
+            safe.gameObject.AddComponent<CellClicker.UI.SafeArea>();
 
             // Header. Own canvas: the total changes every tap, so only this small part gets rebuilt.
-            var header = CreateUI("Header", safe);
-            header.anchorMin = new Vector2(0f, 1f);
-            header.anchorMax = new Vector2(1f, 1f);
-            header.pivot = new Vector2(0.5f, 1f);
-            header.sizeDelta = new Vector2(0f, HeaderHeight);
-            header.anchoredPosition = Vector2.zero;
+            var header = PinTop(Create("Header", safe), 0f, HeaderHeight);
             header.gameObject.AddComponent<Canvas>();
+            TMP_Text amount = BuildAmountRow(header);
+            BuildStatsPill(header, out TMP_Text perTap, out TMP_Text perSecond);
 
-            Material shadow = TmpSetup.SoftShadowPreset;
-            CreateTopText("DNA Label", header, "DNA", 52, LabelColor, FontStyles.Bold, shadow, -40f);
-            TMP_Text amount = CreateTopText("DNA Amount", header, "0", 150, Color.white, FontStyles.Bold, TmpSetup.GlowPreset, -105f);
-            TMP_Text perTap = CreateTopText("Per Tap", header, "+1 per tap", 42, SubtleColor, FontStyles.Normal, shadow, -300f);
-
-            // Play area between header and hint
-            var playArea = CreateUI("Play Area", safe);
+            // Play area between header and bottom strip
+            var playArea = Create("Play Area", safe);
             Stretch(playArea);
-            playArea.offsetMin = new Vector2(SidePadding, HintHeight);
+            playArea.offsetMin = new Vector2(SidePadding, BottomStripHeight + PlayAreaGap);
             playArea.offsetMax = new Vector2(-SidePadding, -HeaderHeight);
 
             // The hive: square, as big as the play area allows.
             // Own canvas + raycaster: it animates every frame, so it shouldn't force the rest of the UI to rebuild.
-            var hiveRect = CreateUI("DNA Hive", playArea);
+            var hiveRect = Create("DNA Hive", playArea);
             Stretch(hiveRect);
             var fitter = hiveRect.gameObject.AddComponent<AspectRatioFitter>();
             fitter.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
@@ -105,22 +107,26 @@ namespace CellClicker.EditorTools
             hiveImage.preserveAspect = true;
             var hive = hiveRect.gameObject.AddComponent<DnaHive>();
 
-            // Hint at the bottom
-            var hint = CreateUI("Hint", safe);
-            hint.anchorMin = new Vector2(0f, 0f);
+            // Hint in the bottom strip, centered between the Organisms button and the right edge's mirror
+            var hint = Create("Hint", safe);
+            hint.anchorMin = Vector2.zero;
             hint.anchorMax = new Vector2(1f, 0f);
             hint.pivot = new Vector2(0.5f, 0f);
-            hint.sizeDelta = new Vector2(0f, HintHeight);
+            hint.sizeDelta = new Vector2(-2f * HintSideInset, BottomStripHeight);
             hint.anchoredPosition = Vector2.zero;
-            AddText(hint.gameObject, "Tap the hive to make DNA", 40, SubtleColor, FontStyles.Normal, shadow);
+            AddText(hint.gameObject, "Tap the DNA Hive to make DNA", 38, SubtleColor, TmpSetup.SoftShadowPreset);
 
-            // Popups on top of everything, on their own canvas (they move every frame)
-            var effects = CreateUI("Effects Layer", canvas);
+            // Popups on top of the HUD, on their own canvas (they move every frame)
+            var effects = Create("Effects Layer", canvas);
             Stretch(effects);
             effects.gameObject.AddComponent<Canvas>();
             var spawner = effects.gameObject.AddComponent<FloatingTextSpawner>();
 
+            // Organisms button (bottom-left) and popup (above everything, built last)
+            OrganismShopBuilder.Build(canvas, safe, bank, roster);
+
             var counter = canvasGo.AddComponent<DnaCounterUI>();
+            var rate = canvasGo.AddComponent<DnaRateUI>();
 
             // Wire references
             Wire(hive, "bank", bank);
@@ -131,6 +137,8 @@ namespace CellClicker.EditorTools
             Wire(counter, "hive", hive);
             Wire(counter, "amountText", amount);
             Wire(counter, "perTapText", perTap);
+            Wire(rate, "generator", generator);
+            Wire(rate, "rateText", perSecond);
 
             EnsureEventSystem();
             SetupCamera();
@@ -139,6 +147,51 @@ namespace CellClicker.EditorTools
             EditorSceneManager.MarkSceneDirty(canvasGo.scene);
             Selection.activeGameObject = hiveRect.gameObject;
             Debug.Log("Cell Clicker: hive scene built. Save the scene (Ctrl+S) and press Play.");
+        }
+
+        // The DNA total with a helix icon in front of it. The icon replaces a "DNA" title:
+        // it reads as "currency" at a glance and keeps the number as the hero.
+        private static TMP_Text BuildAmountRow(RectTransform header)
+        {
+            var row = PinTop(Create("Amount Row", header), 28f, 180f);
+            var layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.spacing = 18f;
+            layout.childControlWidth = layout.childControlHeight = true;
+            layout.childForceExpandWidth = layout.childForceExpandHeight = false;
+
+            var icon = Create("DNA Icon", row);
+            AddPlaceholder(icon.gameObject, ProceduralSpriteKind.Helix, Color.white);
+            var iconSize = icon.gameObject.AddComponent<LayoutElement>();
+            iconSize.preferredWidth = 84f;
+            iconSize.preferredHeight = 112f;
+
+            var amount = Create("DNA Amount", row);
+            return AddText(amount.gameObject, "0", 150, Color.white, TmpSetup.GlowPreset);
+        }
+
+        // One pill under the total: Tap Power on the left, DNA/sec on the right.
+        private static void BuildStatsPill(RectTransform header, out TMP_Text perTap, out TMP_Text perSecond)
+        {
+            var pill = Pin(Create("Stats Pill", header), new Vector2(0.5f, 1f), new Vector2(720f, 88f), new Vector2(0f, -224f));
+            AddRounded(pill.gameObject, PillColor, 44f);
+
+            var tap = Create("Per Tap", pill);
+            Stretch(tap);
+            tap.anchorMax = new Vector2(0.5f, 1f);
+            tap.offsetMin = new Vector2(24f, 0f);
+            tap.offsetMax = new Vector2(-16f, 0f);
+            perTap = AddText(tap.gameObject, "+1 per tap", 40, TapColor, TmpSetup.SoftShadowPreset);
+
+            var divider = Pin(Create("Divider", pill), new Vector2(0.5f, 0.5f), new Vector2(4f, 44f), Vector2.zero);
+            AddRounded(divider.gameObject, new Color(1f, 1f, 1f, 0.2f), 2f);
+
+            var sec = Create("DNA per Second", pill);
+            Stretch(sec);
+            sec.anchorMin = new Vector2(0.5f, 0f);
+            sec.offsetMin = new Vector2(16f, 0f);
+            sec.offsetMax = new Vector2(-24f, 0f);
+            perSecond = AddText(sec.gameObject, "0 DNA/sec", 40, RateColor, TmpSetup.SoftShadowPreset);
         }
 
         private static void RemovePreviousBuild()
@@ -152,7 +205,7 @@ namespace CellClicker.EditorTools
 
         private static void EnsureEventSystem()
         {
-            var eventSystem = Object.FindFirstObjectByType<EventSystem>();
+            var eventSystem = Object.FindAnyObjectByType<EventSystem>();
             if (eventSystem == null)
             {
                 var go = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
@@ -185,56 +238,6 @@ namespace CellClicker.EditorTools
                 urpData.renderPostProcessing = false;
                 urpData.renderShadows = false;
             }
-        }
-
-        private static RectTransform CreateUI(string name, Transform parent)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            var rect = (RectTransform)go.transform;
-            rect.SetParent(parent, false);
-            return rect;
-        }
-
-        private static void Stretch(RectTransform rect)
-        {
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-        }
-
-        // Creates a text anchored to the top center of its parent.
-        private static TMP_Text CreateTopText(string name, Transform parent, string content, float size, Color color, FontStyles style, Material preset, float top)
-        {
-            var rect = CreateUI(name, parent);
-            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 1f);
-            rect.pivot = new Vector2(0.5f, 1f);
-            rect.sizeDelta = new Vector2(1000, size * 1.3f);
-            rect.anchoredPosition = new Vector2(0f, top);
-
-            return AddText(rect.gameObject, content, size, color, style, preset);
-        }
-
-        private static TMP_Text AddText(GameObject go, string content, float size, Color color, FontStyles style, Material preset)
-        {
-            var text = go.AddComponent<TextMeshProUGUI>();
-            text.font = TmpSetup.DefaultFont;
-            if (preset != null) text.fontSharedMaterial = preset;
-            text.text = content;
-            text.fontSize = size;
-            text.fontStyle = style;
-            text.color = color;
-            text.alignment = TextAlignmentOptions.Center;
-            text.textWrappingMode = TextWrappingModes.NoWrap;
-            text.raycastTarget = false;
-            return text;
-        }
-
-        private static void Wire(Object target, string field, Object value)
-        {
-            var so = new SerializedObject(target);
-            so.FindProperty(field).objectReferenceValue = value;
-            so.ApplyModifiedPropertiesWithoutUndo();
         }
     }
 }

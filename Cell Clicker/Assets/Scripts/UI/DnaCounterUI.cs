@@ -7,8 +7,8 @@ using UnityEngine;
 namespace CellClicker.UI
 {
     /// <summary>
-    /// Shows the DNA total and DNA per tap. The total rolls up toward the real value
-    /// and flashes and bumps every time it changes.
+    /// Shows the DNA total and Tap Power. The total rolls toward the real value,
+    /// and flashes and bumps on every tap (not on DNA/sec income, which arrives every frame).
     /// </summary>
     public class DnaCounterUI : MonoBehaviour
     {
@@ -30,8 +30,8 @@ namespace CellClicker.UI
         private float bump;
         private Color baseColor;
 
-        private void OnEnable() => bank.Changed += OnDnaChanged;
-        private void OnDisable() => bank.Changed -= OnDnaChanged;
+        private void OnEnable() => hive.Tapped += OnHiveTapped;
+        private void OnDisable() => hive.Tapped -= OnHiveTapped;
 
         private void Start()
         {
@@ -41,7 +41,7 @@ namespace CellClicker.UI
             perTapText.text = "+" + NumberFormatter.Format(hive.DnaPerTap) + " per tap";
         }
 
-        private void OnDnaChanged(double total) => bump = 1f;
+        private void OnHiveTapped(HiveTap tap) => bump = 1f;
 
         private void Update()
         {

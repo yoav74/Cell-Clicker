@@ -13,6 +13,7 @@ namespace CellClicker.UI
         Background,
         Helix,
         Pill,
+        Microbe,
     }
 
     /// <summary>
@@ -36,6 +37,7 @@ namespace CellClicker.UI
                 ProceduralSpriteKind.Background => Draw(128, 256, Background),
                 ProceduralSpriteKind.Helix => Draw(96, 128, Helix),
                 ProceduralSpriteKind.Pill => Draw(64, 64, Pill, new Vector4(31, 31, 31, 31)),
+                ProceduralSpriteKind.Microbe => Draw(128, 128, Microbe),
                 _ => null,
             };
 
@@ -130,7 +132,34 @@ namespace CellClicker.UI
             return new Color(1f, 1f, 1f, 1f - SmoothStep(1f - aa * 2f, 1f, p.magnitude));
         }
 
+        // A cute blob with a nucleus and eyes, drawn in greys so Image.color can tint it per Organism.
+        private static Color Microbe(Vector2 p, float aa)
+        {
+            float angle = Mathf.Atan2(p.y, p.x);
+            float edge = 0.78f + 0.06f * Mathf.Sin(angle * 5f) + 0.03f * Mathf.Sin(angle * 3f + 1f);
+            float d = p.magnitude;
+
+            float body = 1f - SmoothStep(edge - aa, edge + aa, d);
+            if (body <= 0f) return Color.clear;
+
+            Color c = Color.Lerp(new Color(0.8f, 0.8f, 0.8f), new Color(0.55f, 0.55f, 0.55f), SmoothStep(0f, edge, d));
+            c = Over(c, Color.white, 1f - SmoothStep(0.07f - aa, 0.07f + aa, Mathf.Abs(d - edge + 0.06f)));
+            c = Over(c, new Color(0.35f, 0.35f, 0.35f), Disc(p, new Vector2(0.28f, -0.3f), 0.2f, aa));
+            c = Over(c, new Color(1f, 1f, 1f), Disc(p, new Vector2(-0.35f, 0.4f), 0.1f, aa) * 0.8f);
+            c = Over(c, new Color(0.1f, 0.1f, 0.12f), Disc(p, new Vector2(-0.2f, 0.05f), 0.1f, aa));
+            c = Over(c, new Color(0.1f, 0.1f, 0.12f), Disc(p, new Vector2(0.15f, 0.05f), 0.1f, aa));
+            c = Over(c, Color.white, Disc(p, new Vector2(-0.17f, 0.09f), 0.035f, aa));
+            c = Over(c, Color.white, Disc(p, new Vector2(0.18f, 0.09f), 0.035f, aa));
+            c.a = body;
+            return c;
+        }
+
         // ---------- Helpers ----------
+
+        private static float Disc(Vector2 p, Vector2 center, float radius, float aa)
+        {
+            return 1f - SmoothStep(radius - aa, radius + aa, (p - center).magnitude);
+        }
 
         private delegate Color Shader(Vector2 p, float aa);
 

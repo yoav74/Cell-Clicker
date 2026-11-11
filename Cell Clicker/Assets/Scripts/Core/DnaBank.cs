@@ -28,5 +28,17 @@ namespace CellClicker.Core
             Amount += amount;
             Changed?.Invoke(Amount);
         }
+
+        public bool CanAfford(double cost) => cost >= 0 && Amount >= cost;
+
+        /// <summary>Removes <paramref name="cost"/> if the player has enough. Returns false and changes nothing otherwise.</summary>
+        public bool TrySpend(double cost)
+        {
+            if (!CanAfford(cost)) return false;
+
+            Amount -= cost;
+            Changed?.Invoke(Amount);
+            return true;
+        }
     }
 }

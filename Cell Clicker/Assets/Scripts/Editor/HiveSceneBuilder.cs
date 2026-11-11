@@ -69,7 +69,7 @@ namespace CellClicker.EditorTools
             // Everything interactive/readable sits inside the safe area
             var safe = CreateUI("Safe Area", canvas);
             Stretch(safe);
-            safe.gameObject.AddComponent<SafeArea>();
+            safe.gameObject.AddComponent<CellClicker.UI.SafeArea>();
 
             // Header. Own canvas: the total changes every tap, so only this small part gets rebuilt.
             var header = CreateUI("Header", safe);
@@ -152,7 +152,7 @@ namespace CellClicker.EditorTools
 
         private static void EnsureEventSystem()
         {
-            var eventSystem = Object.FindFirstObjectByType<EventSystem>();
+            var eventSystem = Object.FindAnyObjectByType<EventSystem>();
             if (eventSystem == null)
             {
                 var go = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));

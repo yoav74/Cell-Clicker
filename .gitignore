@@ -79,3 +79,7 @@ Desktop.ini
 # Secrets: never commit signing keys
 *.keystore
 *.jks
+
+# Android build backups and Unity build cache
+*_BackUpThisFolder_ButDontShipItWithYourGame/
+**/.utmp/

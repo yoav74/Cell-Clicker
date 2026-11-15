@@ -1,48 +1,44 @@
-# Pitch: [Game name]
-
-> **What I expect from your game**
-> - **Genre:** hybrid-casual, Android, portrait, played with one thumb. Theme and genre are your choice.
->   Ideas: sort puzzles (Hexa Sort, Water Sort), block puzzles (Block Blast), merge games, one-thumb runners (Subway Surfers), stacking or timing games (Stack), one-thumb action with upgrades (Archero), idle tap games.
-> - **Core loop:** one simple mechanic that is fun in seconds.
-> - **Meta:** a currency and something to spend it on (upgrades, unlocks, a place to build).
-> - **Sessions:** 1–3 minutes.
-> - **Goals:** clear things the player achieves (finish a level, reach a score, unlock an upgrade). Progress you could count.
-> - **Size:** about 3 levels for one person. Bigger team, bigger game: a team of 2–3 builds more (extra levels or an extra system), agreed after the pitch. This is a software engineering course: put your effort into the code, the systems and the data, not into content.
-> - **Look:** placeholder or free art is fine. Fun matters more than looks.
-
-Keep it to one page. Short answers are fine.
+# Pitch: Cell Clicker
 
 ## Core loop
->What does the player do again and again, with one thumb?
-
-The player will have a DNA Hive that he can tap to gain DNA Points and over time have Other Organisms that will help him gain even more and so on and so forth.
+The player taps a DNA Hive to earn DNA, and over time recruits Organisms that earn even more DNA on their own.
 
 ## Meta
-> What do they earn, spend and unlock?
+DNA is spent on upgrading Tap Power, recruiting Organisms that generate DNA, and unlocking upgrades and abilities that increase DNA generation.
 
-the DNA points can be used to upgrade the Tap Output, Recruit Organisms to help gain more DNA and unlock upgrades and abilities to increase the DNA Generation.
-
-also there will be achievements that will grant generation multipliers so the player should try to accomplish them.
+Achievements grant generation multipliers, so the player always has a reason to chase the next one.
 
 ## Why come back?
-> Which 2 hooks bring players back tomorrow? (daily reward, streak, event, lives, collection, notification…)
+1. **Offline Earnings:** DNA keeps coming in at a slower rate while the app is closed.
+2. **Daily Super-Boosters:** every day the player gets 3 free Super-Boosters (+300% generation), and can earn more by watching an ad.
 
-The game will run in a slow pace while the app is closed so the user will collect DNA even while not playing but at a slower pace, every day there will be 3 Free Super-Boosters that increase generation by 300% and after using the boosters you can gain another one by watching an ad.
+## Scope check
+I will build **5 stages**. Each stage is one theme of the DNA Hive:
 
+1. Small Cellular Hive
+2. Microscopic Creatures
+3. Bugs
+4. Animals
+5. Humans
+
+Each stage adds:
+- a new hive theme (look of the hive and background),
+- about 5 new Organisms,
+- a DNA/sec milestone to reach the next stage.
+
+To move to the next stage, the player reaches its DNA/sec requirement and unlocks an Organism from that stage.
+
+The stages share the same systems (DNA, Tap Power, Organisms, saving), so a new stage is mostly new data, not new code.
+
+**Stretch goal (only if time allows):** stage 6, Space and Aliens.
 
 ## Who and when
-> Who plays it, where, and how long is one session? (target: 1–3 minutes)
-
-The game is intended for everyone, especially for people who are interested in Biology, it can be played anywhere, anytime and sessions can be quick 1 minute sessions or tapping for 30 mins.
+For everyone, especially people interested in biology. Played anywhere, anytime: a quick 1-minute session or a 30-minute tapping session.
 
 ## Goals
-> What does the player achieve? List the moments of progress (level completed, upgrade unlocked, new record…).
-
-there would be several DNA/sec Milestone where the Theme of the DNA Hive will change, it starts as a small cellular hive, then developing to microscopic creatures, bugs, animals and then humans (maybe space and aliens).
-
-while progressing there would be achievements based on Total DNA gained, Maximum DNA held, DNA/sec records etc..
+- Reach the next stage's DNA/sec milestone (see Scope check).
+- Recruit and level up each new Organism.
+- Achievements for total DNA earned, most DNA held and DNA/sec records.
 
 ## Feel
-> What will feel "crunchy"? (sound, motion, particles, haptics, timing, numbers)
-
-The biggest "crunchy" feel would be the numbers increasing fast, add a booster that it's value would be based upon player skill (amount of taps in 5 seconds after activation), vfx to increase the feeling of generating a lot of DNA, visual representation of all the player's units.
+The biggest "crunchy" feeling is the numbers growing fast. A skill-based booster: the more taps in the 5 seconds after activating it, the bigger the boost. VFX that sell the feeling of making lots of DNA, and all of the player's units visible on screen.

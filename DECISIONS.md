@@ -1,40 +1,16 @@
 # Decision log
 
-Add an entry every time the team makes a real choice: a tool, a design, a trade-off.
-About 1–2 entries a week. Newest at the top. Write the reasoning yourselves; AI may fix the wording.
-
-## Template
-```
-## YYYY-MM-DD — [The decision, in a few words]
-Options: [A] / [B] / [C]
-Chose: [what] — [why]
-AI: [what the AI suggested, and what you did with it — or "not used"]
-Who: [name(s)]
-```
-
-## Example
-```
-## 2026-11-20 — Save progress locally first
-Options: PlayerPrefs / JSON file / Cloud Save
-Chose: JSON file now, Cloud Save later
-Why: works offline, easy to move later
-AI: suggested a SQLite database — rejected, too heavy for one save file
-Who: Yuval
-```
-
----
-
-<!-- Your entries start here -->
-
 ## 2026-11-11 — Home screen before the Level
 Options: open straight into the Hive / Home screen first, then the Level
 Chose: Home screen first (DNA total and the "While you were away" card), Play goes to the Level 
+Why: the player sees their DNA total and Offline Earnings before playing, and has a calm place to come back to while rewarding returning users.
 AI: suggested to separate into a Home screen and the play scene
 Who: Yoav Gershman
 
 ## 2026-11-11 — Package name and minimum Android version
-Options: set my own
-Chose: company "Xision", package com.Xision.CellClicker, minimum Android SDK 29 (Android 10) in the slides shown in class it was the minimum
+Options: Xision/YoavG/Gershboy for company name and CellClicker already decided as game name.
+Chose: company "Xision", package com.Xision.CellClicker, minimum Android SDK 29 (Android 10)
+Why: SDK 29 is the minimum shown in class; Xision is my gamer tag, so it became the company name.
 AI: not used, Xision is my Gamer tag so i made that the company name and Cell Clicker was the name chosen for the game
 Who: Yoav Gershman
 

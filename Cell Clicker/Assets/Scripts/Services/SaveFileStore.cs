@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 
-namespace CellClicker.Core
+namespace CellClicker.Platform
 {
     /// <summary>
     /// Reads and writes the save file on disk. Each write goes to a temp file first and the previous save

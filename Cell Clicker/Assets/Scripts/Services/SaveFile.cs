@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CellClicker.Core
+namespace CellClicker.Platform
 {
     /// <summary>
     /// The whole save file. A list of key/JSON pairs instead of fixed fields, because JsonUtility can't

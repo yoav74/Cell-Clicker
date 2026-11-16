@@ -1,6 +1,6 @@
 using System;
 
-namespace CellClicker.Core
+namespace CellClicker.Platform
 {
     /// <summary>One <see cref="ISaveable"/>'s data in the save file.</summary>
     [Serializable]

@@ -1,4 +1,4 @@
-using CellClicker.Core;
+using CellClicker.Platform;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,8 +12,8 @@ namespace CellClicker.EditorTools
         [MenuItem(DeleteItem)]
         private static void DeleteSave()
         {
-            new SaveFileStore(SaveSystem.DefaultPath).DeleteAll();
-            Debug.Log($"Cell Clicker: save deleted ({SaveSystem.DefaultPath}).");
+            new SaveFileStore(JsonFileSave.DefaultPath).DeleteAll();
+            Debug.Log($"Cell Clicker: save deleted ({JsonFileSave.DefaultPath}).");
         }
 
         // In Play Mode the SaveSystem would write the file right back.

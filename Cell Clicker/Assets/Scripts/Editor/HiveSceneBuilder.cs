@@ -50,7 +50,7 @@ namespace CellClicker.EditorTools
             RemovePreviousBuild();
 
             // Game systems
-            var systems = new GameObject(SystemsName, typeof(GameBootstrap), typeof(DnaBank), typeof(TapPower), typeof(OrganismRoster),
+            var systems = new GameObject(SystemsName, typeof(DnaBank), typeof(TapPower), typeof(OrganismRoster),
                 typeof(DnaGenerator), typeof(SaveSystem), typeof(ProgressSummary), typeof(OfflineEarningsCollector), typeof(ScreenFlow));
             Undo.RegisterCreatedObjectUndo(systems, "Build Hive Scene");
             var bank = systems.GetComponent<DnaBank>();

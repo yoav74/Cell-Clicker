@@ -1,10 +1,7 @@
 {
     "name": "Services",
-    "rootNamespace": "",
-    "references": [
-        "GUID:6055be8ebefd69e48b49212b09b47b2f",
-        "GUID:6546d7765b4165b40850b3667f981c26"
-    ],
+    "rootNamespace": "CellClicker.Platform",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

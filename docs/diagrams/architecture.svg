@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="1000" height="680" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="680" fill="#ffffff"/>
+  <text x="30" y="40" font-size="24" font-weight="700" fill="#1a1a1a">Cell Clicker architecture</text>
+
+  <!-- ===== Column 1: scenes ===== -->
+  <text x="30" y="76" font-size="16" font-weight="700" fill="#3B6FD8">Scenes (Scene List order)</text>
+
+  <rect x="30" y="90" width="300" height="240" rx="10" fill="#E8F0FE" stroke="#3B6FD8" stroke-width="2"/>
+  <text x="46" y="118" font-size="17" font-weight="700" fill="#1a1a1a">0 · Bootstrap</text>
+  <text x="46" y="142" font-size="13" fill="#444">Bootstrap.Awake(), runs once:</text>
+  <text x="46" y="170" font-size="14" fill="#1a1a1a">• 60 FPS</text>
+  <text x="46" y="196" font-size="14" fill="#1a1a1a">1. Settings  → PlayerPrefsSettings</text>
+  <text x="46" y="222" font-size="14" fill="#1a1a1a">2. Save      → JsonFileSave</text>
+  <text x="46" y="248" font-size="14" fill="#1a1a1a">3. Sound     → AudioSourceSound</text>
+  <text x="46" y="274" font-size="14" fill="#1a1a1a">4. Haptics   → AndroidHaptics</text>
+  <text x="46" y="306" font-size="14" font-weight="700" fill="#1a1a1a">5. LoadScene("Home")</text>
+
+  <line x1="180" y1="330" x2="180" y2="378" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="30" y="380" width="300" height="110" rx="10" fill="#E8F0FE" stroke="#3B6FD8" stroke-width="2"/>
+  <text x="46" y="408" font-size="17" font-weight="700" fill="#1a1a1a">1 · Home</text>
+  <text x="46" y="432" font-size="13" fill="#444">DNA total, "While you were away",</text>
+  <text x="46" y="450" font-size="13" fill="#444">Sound / Haptics toggles, Play</text>
+  <text x="46" y="474" font-size="12" fill="#3B6FD8">uses Save, Settings, Sound, Haptics</text>
+
+  <line x1="130" y1="490" x2="130" y2="548" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="96" y="524" font-size="13" fill="#444">Play</text>
+  <line x1="230" y1="548" x2="230" y2="492" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="240" y="524" font-size="13" fill="#444">Back</text>
+
+  <rect x="30" y="550" width="300" height="110" rx="10" fill="#E8F0FE" stroke="#3B6FD8" stroke-width="2"/>
+  <text x="46" y="578" font-size="17" font-weight="700" fill="#1a1a1a">2 · Level</text>
+  <text x="46" y="602" font-size="13" fill="#444">DNA Hive, Organisms shop,</text>
+  <text x="46" y="620" font-size="13" fill="#444">SaveSystem, Offline Earnings</text>
+  <text x="46" y="644" font-size="12" fill="#3B6FD8">uses Save, Sound, Haptics</text>
+
+  <!-- Bootstrap creates the services -->
+  <line x1="330" y1="200" x2="378" y2="200" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="333" y="192" font-size="12" fill="#444">creates</text>
+
+  <!-- ===== Column 2: services ===== -->
+  <text x="380" y="76" font-size="16" font-weight="700" fill="#2E7D4F">Services (static Services.X)</text>
+
+  <g font-size="12" fill="#444">
+    <rect x="380" y="90" width="290" height="48" rx="8" fill="#E6F4EA" stroke="#2E7D4F" stroke-width="2"/>
+    <text x="394" y="110" font-size="15" font-weight="700" fill="#1a1a1a">Settings · ISettingsService</text>
+    <text x="394" y="128">SoundOn, HapticsOn (PlayerPrefs)</text>
+
+    <rect x="380" y="148" width="290" height="48" rx="8" fill="#E6F4EA" stroke="#2E7D4F" stroke-width="2"/>
+    <text x="394" y="168" font-size="15" font-weight="700" fill="#1a1a1a">Save · ISaveService</text>
+    <text x="394" y="186">save.json, temp file + .bak backup</text>
+
+    <rect x="380" y="206" width="290" height="48" rx="8" fill="#E6F4EA" stroke="#2E7D4F" stroke-width="2"/>
+    <text x="394" y="226" font-size="15" font-weight="700" fill="#1a1a1a">Sound · ISoundService</text>
+    <text x="394" y="244">pool of 8 AudioSources, muted by Settings</text>
+
+    <rect x="380" y="264" width="290" height="48" rx="8" fill="#E6F4EA" stroke="#2E7D4F" stroke-width="2"/>
+    <text x="394" y="284" font-size="15" font-weight="700" fill="#1a1a1a">Haptics · IHapticsService</text>
+    <text x="394" y="302">Android vibration ticks, off by Settings</text>
+  </g>
+
+  <text x="380" y="342" font-size="14" font-weight="700" fill="#777">Planned (order decided when built)</text>
+
+  <g font-size="12" fill="#666">
+    <rect x="380" y="352" width="290" height="48" rx="8" fill="#ffffff" stroke="#888" stroke-width="2" stroke-dasharray="7 5"/>
+    <text x="394" y="372" font-size="15" font-weight="700" fill="#444">Cloud Save</text>
+    <text x="394" y="390">back up the save to a server, optional Account</text>
+
+    <rect x="380" y="410" width="290" height="48" rx="8" fill="#ffffff" stroke="#888" stroke-width="2" stroke-dasharray="7 5"/>
+    <text x="394" y="430" font-size="15" font-weight="700" fill="#444">Ads</text>
+    <text x="394" y="448">rewarded ads for extra Super-Boosters</text>
+
+    <rect x="380" y="468" width="290" height="48" rx="8" fill="#ffffff" stroke="#888" stroke-width="2" stroke-dasharray="7 5"/>
+    <text x="394" y="488" font-size="15" font-weight="700" fill="#444">Notifications</text>
+    <text x="394" y="506">"Your Offline Earnings are ready"</text>
+
+    <rect x="380" y="526" width="290" height="48" rx="8" fill="#ffffff" stroke="#888" stroke-width="2" stroke-dasharray="7 5"/>
+    <text x="394" y="546" font-size="15" font-weight="700" fill="#444">Analytics</text>
+    <text x="394" y="564">sessions, purchases, where players stop</text>
+
+    <rect x="380" y="584" width="290" height="48" rx="8" fill="#ffffff" stroke="#888" stroke-width="2" stroke-dasharray="7 5"/>
+    <text x="394" y="604" font-size="15" font-weight="700" fill="#444">Trusted Time</text>
+    <text x="394" y="622">daily boosters safe from clock changes</text>
+  </g>
+
+  <!-- ===== Column 3: assemblies ===== -->
+  <text x="720" y="76" font-size="16" font-weight="700" fill="#C77D00">Assemblies</text>
+
+  <rect x="720" y="90" width="250" height="64" rx="8" fill="#FFF4E0" stroke="#C77D00" stroke-width="2"/>
+  <text x="734" y="114" font-size="15" font-weight="700" fill="#1a1a1a">Game.Editor</text>
+  <text x="734" y="136" font-size="12" fill="#444">Editor only: scene builders, menus</text>
+
+  <line x1="845" y1="154" x2="845" y2="200" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="855" y="182" font-size="12" fill="#444">references</text>
+
+  <rect x="720" y="202" width="250" height="64" rx="8" fill="#FFF4E0" stroke="#C77D00" stroke-width="2"/>
+  <text x="734" y="226" font-size="15" font-weight="700" fill="#1a1a1a">Game</text>
+  <text x="734" y="248" font-size="12" fill="#444">Core, Hive, Organisms, UI</text>
+
+  <line x1="845" y1="266" x2="845" y2="312" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="855" y="294" font-size="12" fill="#444">references</text>
+
+  <rect x="720" y="314" width="250" height="64" rx="8" fill="#FFF4E0" stroke="#C77D00" stroke-width="2"/>
+  <text x="734" y="338" font-size="15" font-weight="700" fill="#1a1a1a">Services</text>
+  <text x="734" y="360" font-size="12" fill="#444">references nothing</text>
+
+  <text x="720" y="410" font-size="13" fill="#444">Dependencies point one way:</text>
+  <text x="720" y="428" font-size="13" fill="#444">Services never knows about Game,</text>
+  <text x="720" y="446" font-size="13" fill="#444">screens never use PlayerPrefs directly.</text>
+
+  <!-- Legend -->
+  <text x="720" y="510" font-size="14" font-weight="700" fill="#1a1a1a">Legend</text>
+  <rect x="720" y="524" width="36" height="22" rx="4" fill="#E6F4EA" stroke="#2E7D4F" stroke-width="2"/>
+  <text x="766" y="540" font-size="13" fill="#444">built</text>
+  <rect x="720" y="556" width="36" height="22" rx="4" fill="#ffffff" stroke="#888" stroke-width="2" stroke-dasharray="7 5"/>
+  <text x="766" y="572" font-size="13" fill="#444">planned</text>
+  <line x1="720" y1="600" x2="756" y2="600" stroke="#444" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="766" y="604" font-size="13" fill="#444">loads / creates / references</text>
+</svg>

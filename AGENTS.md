@@ -4,13 +4,30 @@ AI tools read this file before working on the repo. Keep it short, true and up t
 If you use Claude Code, also add a `CLAUDE.md` containing one line: `@AGENTS.md`.
 
 ## The game
-**Cell Clicker** is a hybrid-casual idle tap game for Android, played in portrait with one thumb. The player starts as a single cell and taps a DNA Hive to earn DNA. DNA is spent on upgrading DNA per tap, recruiting organisms that generate DNA on their own, and unlocking upgrades, abilities and boosters. Achievements (total DNA earned, most DNA held, DNA/sec records) grant generation multipliers. At DNA/sec milestones the hive's theme evolves: cell → microscopic creatures → bugs → animals → humans (maybe space and aliens). DNA keeps coming in at a slower rate while the app is closed. Every day the player gets 3 free Super-Boosters (+300% generation), and can earn more by watching ads. One booster scales with skill: the more taps in the 5 seconds after activating it, the bigger the boost. Sessions can be a quick minute or a long tapping session. The fun comes from fast-growing numbers, VFX that sell the feeling of making lots of DNA, and seeing all of the player's units on screen.
+**Cell Clicker** is a hybrid-casual idle tap game for Android, played in portrait with one thumb. Everything in this section is in the game now; planned features are in **TO-DO** below.
+- The player starts as a single cell and taps the DNA Hive to earn DNA. Every tap gets instant feedback: squish, glow, "+DNA" popups, a burst, a sound and a short vibration.
+- DNA is spent in the Organisms popup on **Tap Power** (more DNA per tap) and on **Organisms** (Bacterium, Amoeba, Paramecium, Euglena, Volvox) that generate DNA/sec on their own and level up.
+- **Offline Earnings:** DNA keeps coming in at 25% of DNA/sec for up to 2 hours while the app is closed; the Home screen shows it in a "While you were away" card.
+- **Home screen** before the Level: DNA total, DNA/sec, Sound and Haptics toggles, Play.
+- Progress is saved on the phone and survives closing the app.
+- Sessions can be a quick minute or a long tapping session. The fun comes from fast-growing numbers and effects that sell the feeling of making lots of DNA.
+
+## TO-DO (not in the game yet)
+Planned, in no fixed order. Don't treat these as existing code; when one is built, move it up into **The game** and **Architecture**.
+- **Upgrades** for Organisms (beyond Tap Power) and **abilities**.
+- **Boosters:** 3 free Super-Boosters a day (+300% generation), more by watching rewarded ads; a skill booster that grows with the number of taps in the 5 seconds after activating it.
+- **Achievements** (total DNA earned, most DNA held, DNA/sec records) that grant generation multipliers.
+- **Evolution:** at DNA/sec milestones the hive's theme evolves: cell → microscopic creatures → bugs → animals → humans (maybe space and aliens).
+- Seeing all of the player's units on screen.
+- **Services:** Cloud Save (server, with an optional Account), Ads, Notifications, Analytics, Trusted Time (so daily boosters can't be cheated by changing the clock). Each one becomes a new service in `Services/<Name>/` (see the README diagram).
+- Real art and audio in place of the code-drawn placeholders; a better look for the Sound/Haptics buttons.
+- Maybe later: a prestige-style reset (see `DECISIONS.md`).
 
 ## Tech
 - Engine: Unity 6000.6.7f1, C#
 - Target: Android (portrait)
 - UI: uGUI + TextMeshPro (in `com.unity.ugui` 2.6; TMP Essential Resources in `Assets/TextMesh Pro/`), URP 17.6, Input System 1.20
-- No third-party SDKs or online services yet. Planned services: Cloud Save (server), Ads (rewarded, for Super-Boosters), Notifications, Analytics, Trusted Time. Each will be a new service in `Services/<Name>/` (see the README diagram).
+- No third-party SDKs or online services yet (planned ones are in **TO-DO**).
 
 ## Architecture
 
@@ -21,7 +38,7 @@ If you use Claude Code, also add a `CLAUDE.md` containing one line: `@AGENTS.md`
 
 ### Start-up, scenes and assemblies
 - Scene List: **Bootstrap** → **Home** → **Level** (`Assets/Game/Scenes/`).
-- **Bootstrap** scene: only `Bootstrap` (Core). It sets 60 FPS, creates the services in this order: **Settings → Save → Sound → Haptics** (Sound and Haptics read Settings), then loads Home. Nothing else creates services. Always press Play from Bootstrap.
+- **Bootstrap** scene: the default camera and light, plus a `Services` object with `Bootstrap` (Core), the only script. It sets 60 FPS, creates the services in this order: **Settings → Save → Sound → Haptics** (Sound and Haptics read Settings), then loads Home. Nothing else creates services. Always press Play from Bootstrap.
 - **Home**: title, DNA total, "While you were away" card, Sound/Haptics toggles (top-right), Play. **Level**: the hive. `ScreenFlow` (UI) has `Play()` / `Back()`; Level has a Home button top-left.
 - Three assemblies, dependencies point one way: **Game.Editor → Game → Services**.
   - `Services` (`Assets/Game/Scripts/Services/Services.asmdef`, namespace `CellClicker.Platform`): references nothing. Never reference Game code from here.

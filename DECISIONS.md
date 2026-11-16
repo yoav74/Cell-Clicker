@@ -1,5 +1,26 @@
 # Decision log
 
+## 2026-11-16 — Settings in PlayerPrefs, progress in the save file
+Options: store Sound and Haptics inside save.json through `ISaveService` / store them in PlayerPrefs behind their own `ISettingsService`
+Chose: PlayerPrefs behind `ISettingsService` (`PlayerPrefsSettings`, the only class that touches PlayerPrefs); progress stays in save.json
+Why: the player keeps their preferences even if they delete their save.
+AI: offered both options and recommended PlayerPrefs, because settings belong to the device and a future cloud restore wouldn't overwrite them. I went with it.
+Who: Yoav Gershman
+
+## 2026-11-16 — Get each sound clip once, not on every play
+Options: call `ProceduralSounds.Get` every time a sound plays / get the clip once when the component starts (`Awake`)
+Chose: get the clip once in `Awake` and keep it in a field (`ShopRowUI` does it in `ListenToBuyButton`, because its subclasses have their own `Awake`)
+Why: looking up the sound on every tap is work the game doesn't need to repeat; getting it once is simpler and cleaner.
+AI: wrote the first version that called `Get` on every play. When I questioned it, it explained the lookup itself is cheap but the first tap was generating the clip, which could cause a small hitch, and made the change. It also explained why `AudioSourceSound` must keep setting clip, volume and pitch on every play (the voices are shared), so I left that as it is.
+Who: Yoav Gershman
+
+## 2026-11-16 — Save goes through an ISaveService interface
+Options: SaveSystem writes save.json directly / screens use PlayerPrefs / everything goes through `ISaveService` (in the Services assembly)
+Chose: `ISaveService`, implemented by `JsonFileSave` (save.json kept in memory, temp file + .bak backup), created by Bootstrap; screens only use `Services.Save`
+Why: a modular system where I can swap the pieces I work with without breaking and changing every piece of code that uses a service. Cloud saving comes later, and I want adding it to be seamless.
+AI: suggested routing the existing JSON save through the interface and explained why JSON fits progress better than PlayerPrefs (DNA is a double, structured Organism data, one safe write, easy cloud upload). I kept JSON for progress and put the settings in PlayerPrefs behind their own service.
+Who: Yoav Gershman
+
 ## 2026-11-11 — Home screen before the Level
 Options: open straight into the Hive / Home screen first, then the Level
 Chose: Home screen first (DNA total and the "While you were away" card), Play goes to the Level 

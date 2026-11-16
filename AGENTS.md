@@ -10,13 +10,14 @@ If you use Claude Code, also add a `CLAUDE.md` containing one line: `@AGENTS.md`
 - Engine: Unity 6000.6.7f1, C#
 - Target: Android (portrait)
 - UI: uGUI + TextMeshPro (in `com.unity.ugui` 2.6; TMP Essential Resources in `Assets/TextMesh Pro/`), URP 17.6, Input System 1.20
-- No third-party SDKs or online services yet (a cloud save server is planned).
+- No third-party SDKs or online services yet. Planned services: Cloud Save (server), Ads (rewarded, for Super-Boosters), Notifications, Analytics, Trusted Time. Each will be a new service in `Services/<Name>/` (see the README diagram).
 
 ## Architecture
 
 ### Project layout
 - Unity project lives in `Cell Clicker/`. Everything the team makes is in `Assets/Game/`: `Art/`, `Data/` (tunable ScriptableObjects), `Scenes/`, `Scripts/`. Script paths below are relative to `Assets/Game/Scripts/`.
 - The rest of `Assets/` belongs to Unity and packages; leave it alone unless asked: `Settings/Rendering/` (URP assets, renderers, volume profiles), `Settings/PlayMode/` (Play Mode scenario that starts from Bootstrap), `TextMesh Pro/` (TMP resources), `InputSystem_Actions.inputactions`.
+- Outside Unity, `docs/` at the repo root holds media for the README and course tasks: `diagrams/`, `screenshots/`, `videos/` (keep clips short; link long videos instead of committing them).
 
 ### Start-up, scenes and assemblies
 - Scene List: **Bootstrap** → **Home** → **Level** (`Assets/Game/Scenes/`).

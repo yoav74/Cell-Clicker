@@ -1,3 +1,4 @@
+using CellClicker.Platform;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,6 +27,11 @@ namespace CellClicker.UI
         [SerializeField] private Color unaffordableColor = new Color32(58, 74, 86, 255);
         [SerializeField] private float punchScale = 1.15f;
         [SerializeField] private float punchRecoverSpeed = 10f;
+
+        [Header("Feedback")]
+        [Tooltip("Leave empty to use the placeholder chime made in code.")]
+        [SerializeField] private AudioClip buySound;
+        [SerializeField] private HapticStrength buyHaptic = HapticStrength.Medium;
 
         private bool? shownAffordable;
         private float punch;
@@ -84,7 +90,11 @@ namespace CellClicker.UI
 
         private void OnBuyClicked()
         {
-            if (TryBuy()) punch = 1f;
+            if (!TryBuy()) return;
+
+            punch = 1f;
+            Services.Sound?.Play(buySound != null ? buySound : ProceduralSounds.Get(ProceduralSoundKind.Buy));
+            Services.Haptics?.Pulse(buyHaptic);
         }
     }
 }

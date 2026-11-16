@@ -12,10 +12,10 @@ namespace CellClicker.EditorTools
     /// <summary>
     /// Menu: Cell Clicker > Build Home Scene.
     /// Renames SampleScene to Level (the hive), creates Assets/Scenes/Home.unity with the Home screen,
-    /// and sets the Scene List to Home first (the phone opens the first scene), then Level.
+    /// and sets the Scene List to Bootstrap first (the phone opens the first scene), then Home, then Level.
     ///
     /// Layout (portrait, inside the safe area):
-    ///   Top    - game title
+    ///   Top    - Sound and Haptics toggles (top-right), game title
     ///   Middle - DNA total + DNA/sec, and the "While you were away" card after a break
     ///   Bottom - big Play button in the thumb zone
     /// </summary>
@@ -25,9 +25,14 @@ namespace CellClicker.EditorTools
         private const string HomePath = ScenesFolder + "/Home.unity";
         private const string LevelPath = ScenesFolder + "/Level.unity";
         private const string OldLevelPath = ScenesFolder + "/SampleScene.unity";
+        private const string BootstrapPath = ScenesFolder + "/Bootstrap.unity";
 
         private static readonly Vector2 PlayButtonSize = new Vector2(620f, 200f);
+        private static readonly Vector2 ToggleSize = new Vector2(220f, MinTapSize);
         private const float SidePadding = 60f;
+        private const float ToggleTop = 30f;
+        private const float ToggleGap = 20f;
+        private const float TitleTop = 200f; // below the toggles
 
         private static readonly Color Gold = new Color32(255, 196, 64, 255);
         private static readonly Color Ink = new Color32(30, 22, 10, 255);
@@ -55,7 +60,7 @@ namespace CellClicker.EditorTools
 
             EditorSceneManager.SaveScene(scene, HomePath);
             SetSceneList();
-            Debug.Log("Cell Clicker: Home scene built and saved. Scene List = Home, Level. Press Play from Home.");
+            Debug.Log("Cell Clicker: Home scene built and saved. Scene List = Bootstrap, Home, Level. Press Play from Bootstrap.");
         }
 
         private static void BuildHomeUi()
@@ -74,7 +79,9 @@ namespace CellClicker.EditorTools
             Stretch(safe);
             safe.gameObject.AddComponent<CellClicker.UI.SafeArea>(); // full name: Unity has its own SafeArea type
 
-            RectTransform title = PinTop(Create("Title", safe), 120f, 200f, SidePadding, SidePadding);
+            BuildSettingToggles(safe);
+
+            RectTransform title = PinTop(Create("Title", safe), TitleTop, 200f, SidePadding, SidePadding);
             AddText(title.gameObject, "Cell Clicker", 150, Color.white, TmpSetup.GlowPreset);
 
             RectTransform cell = Pin(Create("Cell", safe), new Vector2(0.5f, 0.62f), new Vector2(380f, 380f), Vector2.zero);
@@ -122,6 +129,36 @@ namespace CellClicker.EditorTools
             return card.gameObject;
         }
 
+        // Top-right, away from Play: changed rarely, so they don't need the thumb zone.
+        private static void BuildSettingToggles(Transform safe)
+        {
+            float hapticsX = -SidePadding;
+            float soundX = hapticsX - ToggleSize.x - ToggleGap;
+            BuildSettingToggle<SoundToggleUI>(safe, "Sound Toggle", "Sound", new Vector2(soundX, -ToggleTop));
+            BuildSettingToggle<HapticsToggleUI>(safe, "Haptics Toggle", "Haptics", new Vector2(hapticsX, -ToggleTop));
+        }
+
+        private static void BuildSettingToggle<T>(Transform safe, string name, string title, Vector2 position) where T : SettingToggleUI
+        {
+            RectTransform rect = Pin(Create(name, safe), Vector2.one, ToggleSize, position);
+            Image background = AddRounded(rect.gameObject, Color.white, 40f, raycast: true);
+            var button = rect.gameObject.AddComponent<Button>();
+            button.targetGraphic = background;
+
+            RectTransform labelRect = Create("Label", rect);
+            Stretch(labelRect);
+            TMP_Text label = AddText(labelRect.gameObject, title + "\nON", 40, Color.white, TmpSetup.SoftShadowPreset);
+
+            var toggle = rect.gameObject.AddComponent<T>();
+            Wire(toggle, "button", button);
+            Wire(toggle, "background", background);
+            Wire(toggle, "label", label);
+
+            var so = new SerializedObject(toggle);
+            so.FindProperty("title").stringValue = title;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
         // The core action, bottom-center in the thumb zone; well above the 140 px minimum.
         private static Button BuildPlayButton(Transform safe)
         {
@@ -152,8 +189,10 @@ namespace CellClicker.EditorTools
 
         private static void SetSceneList()
         {
+            // Bootstrap must stay first: it creates the services every screen uses.
             EditorBuildSettings.scenes = new[]
             {
+                new EditorBuildSettingsScene(BootstrapPath, true),
                 new EditorBuildSettingsScene(HomePath, true),
                 new EditorBuildSettingsScene(LevelPath, true),
             };

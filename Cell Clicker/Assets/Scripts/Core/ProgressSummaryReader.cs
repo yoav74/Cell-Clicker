@@ -1,21 +1,22 @@
 using System;
+using CellClicker.Platform;
 using UnityEngine;
 
 namespace CellClicker.Core
 {
-    /// <summary>Reads the <see cref="ProgressSummary"/> from the save file without writing anything.</summary>
+    /// <summary>Reads the <see cref="ProgressSummary"/> from the save without writing anything.</summary>
     public static class ProgressSummaryReader
     {
         /// <returns>False for a new player (no save yet) or a save without a summary.</returns>
-        public static bool TryRead(out ProgressSummaryData data, out DateTime savedAtUtc)
+        public static bool TryRead(ISaveService save, out ProgressSummaryData data, out DateTime savedAtUtc)
         {
             data = null;
             savedAtUtc = default;
+            if (save?.LastSavedUtc == null) return false;
 
-            if (!new SaveFileStore(SaveSystem.DefaultPath).TryLoad(out SaveFile file)) return false;
-
-            string json = file.Find(ProgressSummary.Key);
-            if (json == null || !SaveSystem.TryGetUtc(file.savedAtUtcTicks, out savedAtUtc)) return false;
+            string json = save.Load(ProgressSummary.Key);
+            if (json == null) return false;
+            savedAtUtc = save.LastSavedUtc.Value;
 
             try
             {

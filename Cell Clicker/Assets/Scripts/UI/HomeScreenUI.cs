@@ -1,5 +1,6 @@
 using System;
 using CellClicker.Core;
+using CellClicker.Platform;
 using TMPro;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ namespace CellClicker.UI
         {
             awayCard.SetActive(false);
 
-            if (!ProgressSummaryReader.TryRead(out ProgressSummaryData summary, out DateTime savedAtUtc))
+            if (!ProgressSummaryReader.TryRead(Services.Save, out ProgressSummaryData summary, out DateTime savedAtUtc))
             {
                 totalText.text = "0";
                 rateText.text = "Tap the DNA Hive to start";

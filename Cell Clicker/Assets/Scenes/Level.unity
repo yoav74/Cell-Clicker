@@ -5032,7 +5032,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1466829895}
-  - component: {fileID: 1466829894}
   - component: {fileID: 1466829886}
   - component: {fileID: 1466829887}
   - component: {fileID: 1466829888}
@@ -5171,19 +5170,6 @@ MonoBehaviour:
   - {fileID: 1466829888}
   - {fileID: 1466829892}
   autosaveInterval: 5
---- !u!114 &1466829894
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1466829885}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ebebb9542319e204c893c8621de1eaee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CellClicker.Core.GameBootstrap
-  targetFrameRate: 60
 --- !u!4 &1466829895
 Transform:
   m_ObjectHideFlags: 0

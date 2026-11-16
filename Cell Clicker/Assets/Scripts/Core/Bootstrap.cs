@@ -19,8 +19,11 @@ namespace CellClicker.Core
         {
             Application.targetFrameRate = targetFrameRate;
 
-            // Order matters: later services may read settings or progress from the save.
+            // Order matters: Sound and Haptics read the Settings, so Settings comes first.
+            Services.Settings = new PlayerPrefsSettings();
             Services.Save = new JsonFileSave();
+            Services.Sound = new AudioSourceSound(Services.Settings);
+            Services.Haptics = new AndroidHaptics(Services.Settings);
 
             SceneManager.LoadScene(firstScene);
         }

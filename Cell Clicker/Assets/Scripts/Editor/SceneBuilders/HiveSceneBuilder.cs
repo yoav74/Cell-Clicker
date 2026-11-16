@@ -143,6 +143,7 @@ namespace CellClicker.EditorTools
             Wire(hive, "bank", bank);
             Wire(hive, "tapPower", tapPower);
             Wire(spawner, "hive", hive);
+            HiveFeedbackSetup.AddTo(hive);
             Wire(spawner, "font", TmpSetup.DefaultFont);
             Wire(spawner, "material", TmpSetup.PopupPreset);
             Wire(counter, "bank", bank);

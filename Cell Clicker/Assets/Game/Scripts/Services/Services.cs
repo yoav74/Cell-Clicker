@@ -8,6 +8,7 @@ namespace CellClicker.Platform
     {
         public static ISettingsService Settings { get; set; }
         public static ISaveService Save { get; set; }
+        public static IConfigService Config { get; set; }
         public static ISoundService Sound { get; set; }
         public static IHapticsService Haptics { get; set; }
     }

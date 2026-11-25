@@ -19,4 +19,4 @@ MonoBehaviour:
   baseCost: 15
   costGrowth: 1.15
   firstLevelDnaPerSecond: 1
-  dnaPerSecondPerLevel: 0.5
+  dnaPerSecondPerLevel: 0.2

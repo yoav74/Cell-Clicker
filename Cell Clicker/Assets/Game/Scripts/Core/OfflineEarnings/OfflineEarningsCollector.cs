@@ -1,4 +1,5 @@
 using System;
+using CellClicker.Platform;
 using UnityEngine;
 
 namespace CellClicker.Core
@@ -12,7 +13,8 @@ namespace CellClicker.Core
         [SerializeField] private SaveSystem saveSystem;
         [SerializeField] private DnaGenerator generator;
         [SerializeField] private DnaBank bank;
-        [SerializeField] private OfflineEarningsSettings settings;
+
+        private OfflineEarningsSettings settings;
 
         private DateTime? lastPaidUtc;
         private bool started;
@@ -23,6 +25,13 @@ namespace CellClicker.Core
         // SaveSystem (execution order -100) has loaded, and the Organisms restored their DNA/sec, before this Start.
         private void Start()
         {
+            settings = Services.Config.Economy()?.OfflineEarnings;
+            if (settings == null)
+            {
+                enabled = false;
+                return;
+            }
+
             started = true;
             Collect();
         }

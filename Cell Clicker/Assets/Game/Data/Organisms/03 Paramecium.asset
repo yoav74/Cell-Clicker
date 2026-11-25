@@ -16,7 +16,7 @@ MonoBehaviour:
   saveId: paramecium
   icon: {fileID: 0}
   tint: {r: 1, g: 0.8039216, b: 0.43137255, a: 1}
-  baseCost: 1100
+  baseCost: 2200
   costGrowth: 1.15
-  firstLevelDnaPerSecond: 16
-  dnaPerSecondPerLevel: 8
+  firstLevelDnaPerSecond: 145
+  dnaPerSecondPerLevel: 29

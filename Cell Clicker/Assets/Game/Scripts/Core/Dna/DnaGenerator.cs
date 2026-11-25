@@ -4,7 +4,8 @@ using UnityEngine;
 namespace CellClicker.Core
 {
     /// <summary>
-    /// Adds the DNA/sec of every <see cref="IDnaSource"/> to the <see cref="DnaBank"/> each frame.
+    /// Adds the DNA/sec of every <see cref="IDnaSource"/>, times the <see cref="IDnaModifiers"/> all-DNA boost, to the
+    /// <see cref="DnaBank"/> each frame.
     /// The UI reads the total DNA/sec from here, so it never needs to know where DNA comes from.
     /// </summary>
     public class DnaGenerator : MonoBehaviour
@@ -12,8 +13,11 @@ namespace CellClicker.Core
         [SerializeField] private DnaBank bank;
         [Tooltip("Components that implement IDnaSource, e.g. the OrganismRoster.")]
         [SerializeField] private MonoBehaviour[] sources;
+        [Tooltip("Optional. A component that implements IDnaModifiers, e.g. the UpgradeSystem.")]
+        [SerializeField] private MonoBehaviour modifiersSource;
 
         private IDnaSource[] dnaSources = Array.Empty<IDnaSource>();
+        private IDnaModifiers modifiers;
 
         public double DnaPerSecond { get; private set; }
 
@@ -22,6 +26,10 @@ namespace CellClicker.Core
 
         private void Awake()
         {
+            modifiers = modifiersSource as IDnaModifiers;
+            if (modifiersSource != null && modifiers == null)
+                Debug.LogError($"{modifiersSource.name} does not implement IDnaModifiers.", this);
+
             if (sources == null) return;
 
             int count = 0;
@@ -37,12 +45,14 @@ namespace CellClicker.Core
         private void OnEnable()
         {
             foreach (IDnaSource source in dnaSources) source.RateChanged += Recalculate;
+            if (modifiers != null) modifiers.Changed += Recalculate;
             Recalculate();
         }
 
         private void OnDisable()
         {
             foreach (IDnaSource source in dnaSources) source.RateChanged -= Recalculate;
+            if (modifiers != null) modifiers.Changed -= Recalculate;
         }
 
         private void Update()
@@ -54,6 +64,7 @@ namespace CellClicker.Core
         {
             double total = 0;
             foreach (IDnaSource source in dnaSources) total += source.DnaPerSecond;
+            if (modifiers != null) total *= modifiers.AllDnaMultiplier;
 
             DnaPerSecond = total;
             RateChanged?.Invoke(total);
@@ -67,6 +78,8 @@ namespace CellClicker.Core
                 if (source != null && source is not IDnaSource)
                     Debug.LogWarning($"{source.name} does not implement IDnaSource and will be ignored.", this);
             }
+            if (modifiersSource != null && modifiersSource is not IDnaModifiers)
+                Debug.LogWarning($"{modifiersSource.name} does not implement IDnaModifiers and will be ignored.", this);
         }
     }
 }

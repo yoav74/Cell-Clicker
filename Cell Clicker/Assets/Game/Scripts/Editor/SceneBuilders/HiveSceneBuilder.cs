@@ -22,7 +22,8 @@ namespace CellClicker.EditorTools
     /// Layout (portrait, inside the safe area):
     ///   Header      - fixed height at the top (DNA total with a helix icon, Tap Power and DNA/sec pill)
     ///   Play Area   - everything between header and bottom strip; the hive scales to fit it, so it never covers the HUD
-    ///   Bottom strip - Organisms button (bottom-left) and the hint, below the play area so they can't steal hive taps
+    ///   Bottom strip - Organisms button (bottom-left), Upgrades button (bottom-right) and the hint between them,
+    ///                  below the play area so they can't steal hive taps
     /// </summary>
     public static class HiveSceneBuilder
     {
@@ -32,7 +33,7 @@ namespace CellClicker.EditorTools
         private const float HeaderHeight = 330f;
         private const float BottomStripHeight = 230f;
         private const float PlayAreaGap = 24f;
-        private const float HintSideInset = 220f; // keeps the centered hint clear of the Organisms button
+        private const float HintSideInset = 220f; // keeps the centered hint clear of both shop buttons
         private const float SidePadding = 40f;
 
         internal static readonly Color Background = new Color32(10, 22, 34, 255);
@@ -50,29 +51,33 @@ namespace CellClicker.EditorTools
             RemovePreviousBuild();
 
             // Game systems
-            var systems = new GameObject(SystemsName, typeof(DnaBank), typeof(TapPower), typeof(OrganismRoster),
+            var systems = new GameObject(SystemsName, typeof(DnaBank), typeof(TapPower), typeof(UpgradeSystem), typeof(OrganismRoster),
                 typeof(DnaGenerator), typeof(SaveSystem), typeof(ProgressSummary), typeof(OfflineEarningsCollector), typeof(ScreenFlow));
             Undo.RegisterCreatedObjectUndo(systems, "Build Hive Scene");
             var bank = systems.GetComponent<DnaBank>();
             var tapPower = systems.GetComponent<TapPower>();
+            var upgrades = systems.GetComponent<UpgradeSystem>();
             var roster = systems.GetComponent<OrganismRoster>();
             var generator = systems.GetComponent<DnaGenerator>();
             var saveSystem = systems.GetComponent<SaveSystem>();
             var summary = systems.GetComponent<ProgressSummary>();
             var collector = systems.GetComponent<OfflineEarningsCollector>();
+            // The economy numbers come from Services.Config at runtime; this only makes sure the asset exists.
+            EconomyConfigDefaults.GetOrCreate();
             Wire(tapPower, "bank", bank);
-            Wire(tapPower, "definition", TapPowerDefaults.GetOrCreate());
+            Wire(tapPower, "modifiersSource", upgrades);
+            Wire(upgrades, "bank", bank);
             Wire(roster, "bank", bank);
-            WireArray(roster, "definitions", OrganismDefaults.GetOrCreate());
+            Wire(roster, "modifiersSource", upgrades);
             Wire(generator, "bank", bank);
             WireArray(generator, "sources", roster);
+            Wire(generator, "modifiersSource", upgrades);
             Wire(summary, "bank", bank);
             Wire(summary, "generator", generator);
-            WireArray(saveSystem, "saveables", bank, tapPower, roster, summary);
+            WireArray(saveSystem, "saveables", bank, tapPower, upgrades, roster, summary);
             Wire(collector, "saveSystem", saveSystem);
             Wire(collector, "generator", generator);
             Wire(collector, "bank", bank);
-            Wire(collector, "settings", OfflineEarningsDefaults.GetOrCreate());
 
             var canvasGo = CreatePortraitCanvas(CanvasName);
             Undo.RegisterCreatedObjectUndo(canvasGo, "Build Hive Scene");
@@ -133,8 +138,9 @@ namespace CellClicker.EditorTools
             effects.gameObject.AddComponent<Canvas>();
             var spawner = effects.gameObject.AddComponent<FloatingTextSpawner>();
 
-            // Organisms button (bottom-left) and popup (above everything, built last)
+            // Shop buttons in the bottom corners (Organisms left, Upgrades right) and their popups (above everything)
             OrganismShopBuilder.Build(canvas, safe, bank, tapPower, roster);
+            UpgradeShopBuilder.Build(canvas, safe, bank, upgrades);
 
             var counter = canvasGo.AddComponent<DnaCounterUI>();
             var rate = canvasGo.AddComponent<DnaRateUI>();

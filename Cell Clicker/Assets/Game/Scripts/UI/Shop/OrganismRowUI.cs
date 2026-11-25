@@ -36,6 +36,7 @@ namespace CellClicker.UI
 
             bank.Changed += OnDnaChanged;
             roster.LevelChanged += OnLevelChanged;
+            roster.CostsChanged += RefreshAll;
             RefreshAll();
         }
 
@@ -45,6 +46,7 @@ namespace CellClicker.UI
 
             bank.Changed -= OnDnaChanged;
             roster.LevelChanged -= OnLevelChanged;
+            roster.CostsChanged -= RefreshAll;
         }
 
         protected override bool TryBuy() => roster.TryLevelUp(organism);
@@ -63,7 +65,7 @@ namespace CellClicker.UI
             nameText.text = unlocked ? definition.DisplayName : lockedName;
             infoText.text = InfoLine(unlocked);
             actionText.text = !unlocked ? lockedLabel : organism.IsRecruited ? levelUpLabel : recruitLabel;
-            costText.text = NumberFormatter.Format(organism.NextCost);
+            costText.text = NumberFormatter.Format(roster.CostOf(organism));
         }
 
         private string InfoLine(bool unlocked)

@@ -30,14 +30,15 @@ namespace CellClicker.EditorTools
             }
         }
 
-        // Each Organism costs ~10x the last and earns 4x; each level after the first adds half the first level.
+        // Each Organism costs ~12x the last and earns ~12x, while each level after the first adds only a fifth
+        // of the first level. So leveling old Organisms stays small, and every new one multiplies income ~4x.
         private static readonly Entry[] Entries =
         {
-            new Entry("Bacterium", 15, 1, 0.5, new Color32(120, 235, 190, 255)),
-            new Entry("Amoeba", 100, 4, 2, new Color32(140, 195, 255, 255)),
-            new Entry("Paramecium", 1100, 16, 8, new Color32(255, 205, 110, 255)),
-            new Entry("Euglena", 12000, 64, 32, new Color32(150, 240, 120, 255)),
-            new Entry("Volvox", 130000, 256, 128, new Color32(205, 150, 255, 255)),
+            new Entry("Bacterium", 15, 1, 0.2, new Color32(120, 235, 190, 255)),
+            new Entry("Amoeba", 180, 12, 2.4, new Color32(140, 195, 255, 255)),
+            new Entry("Paramecium", 2200, 145, 29, new Color32(255, 205, 110, 255)),
+            new Entry("Euglena", 26000, 1750, 350, new Color32(150, 240, 120, 255)),
+            new Entry("Volvox", 310000, 21000, 4200, new Color32(205, 150, 255, 255)),
         };
 
         public static OrganismDefinition[] GetOrCreate()

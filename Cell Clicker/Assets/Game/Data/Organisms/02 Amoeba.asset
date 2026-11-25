@@ -16,7 +16,7 @@ MonoBehaviour:
   saveId: amoeba
   icon: {fileID: 0}
   tint: {r: 0.54901963, g: 0.7647059, b: 1, a: 1}
-  baseCost: 100
+  baseCost: 180
   costGrowth: 1.15
-  firstLevelDnaPerSecond: 4
-  dnaPerSecondPerLevel: 2
+  firstLevelDnaPerSecond: 12
+  dnaPerSecondPerLevel: 2.4

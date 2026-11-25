@@ -16,7 +16,7 @@ MonoBehaviour:
   saveId: euglena
   icon: {fileID: 0}
   tint: {r: 0.5882353, g: 0.9411765, b: 0.47058824, a: 1}
-  baseCost: 12000
+  baseCost: 26000
   costGrowth: 1.15
-  firstLevelDnaPerSecond: 64
-  dnaPerSecondPerLevel: 32
+  firstLevelDnaPerSecond: 1750
+  dnaPerSecondPerLevel: 350

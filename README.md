@@ -19,9 +19,16 @@ Add Bigger units that can mine more DNA, give each unit upgrades and have booste
 Editable source: [`docs/diagrams/architecture.svg`](docs/diagrams/architecture.svg).
 
 - **Scenes:** Bootstrap → Home → Level. Bootstrap is first in the Scene List, runs once and never comes back.
-- **Init order:** Bootstrap sets 60 FPS, then creates Settings → Save → Sound → Haptics (Sound and Haptics read Settings), then opens Home.
+- **Init order:** Bootstrap sets 60 FPS, then creates Settings → Save → Config → Sound → Haptics (Sound and Haptics read Settings), then opens Home.
 - **Services:** screens and systems reach them through `Services.X`, never PlayerPrefs or files directly. Dashed boxes are planned services: Cloud Save, Ads, Notifications, Analytics, Trusted Time.
 - **Assemblies:** Game.Editor → Game → Services. Services never references Game.
+
+## Economy
+- **Economy sheet:** [Cell Clicker economy sheet](https://docs.google.com/spreadsheets/d/1eVmkNFCU8AGZUAolbHfTbk1OuyTBsEdRGJzb0rYiS4o/edit?gid=2000618970). Both checks say Yes.
+- **Currency:** DNA. Sources: tapping the Hive, Organisms (DNA/sec), Offline Earnings. Sinks every session: Tap Power and Organism levels (Organisms shop).
+- **Organisms:** each one costs ~12x the last and earns ~12x, so every new Organism multiplies income about 4x.
+- **Big sink:** the Upgrades shop. Richer DNA (+25% all DNA per level, price 3,000 × 3^level, the sheet's curve), Stronger Taps (+50% DNA per tap, 1,000 × 3^level) and Cheaper Organisms (-5% Organism cost, 5,000 × 4^level), 10 levels each. Prices grow ×3 because income grows ~×4 with every new Organism.
+- **Config:** every economy number lives in `Assets/Game/Data/Economy Config.asset` (it points at the Tap Power, Organism, Upgrade and Offline Earnings assets) and is read through `Services.Config`.
 
 ## Repo map
 | File | What it is |
@@ -29,6 +36,7 @@ Editable source: [`docs/diagrams/architecture.svg`](docs/diagrams/architecture.s
 | `pitch.md` | One-page pitch of the game |
 | `DECISIONS.md` | Every real decision the team made, and why |
 | `AGENTS.md` | Context for AI coding tools: architecture, rules, conventions |
+| `CREDITS.md` | Fonts and other assets we didn't make, with their licences |
 | `docs/` | Media for the README and course tasks: `diagrams/` (architecture), `screenshots/`, `videos/` |
 | `Cell Clicker/` | The Unity project; our files are in `Assets/Game/` |
 

@@ -1,5 +1,12 @@
 # Decision log
 
+## 2026-11-25 — Upgrade prices grow x3 per level
+Options: x1.5 per level (the course example) / x2.5 / x3 (x4 for Cheaper Organisms)
+Chose: x3 for Richer DNA (base 3,000) and Stronger Taps (base 1,000), x4 for Cheaper Organisms (base 5,000), 10 levels each
+Why: every new Organism multiplies income about x4, so at x1.6 all 30 Upgrade levels were maxed too fast and didn't drive the player to push towards, at the rate of x3, the upgrades take meaningful time to reach.
+AI: simulated 10 to 30 sessions of play with the new Organism curve and found that x1.6 maxed out too early. It compared x1.6, x2.5, x3, x3.5 and x4 and recommended x3. I picked x3.
+Who: Yoav Gershman
+
 ## 2026-11-16 — Settings in PlayerPrefs, progress in the save file
 Options: store Sound and Haptics inside save.json through `ISaveService` / store them in PlayerPrefs behind their own `ISettingsService`
 Chose: PlayerPrefs behind `ISettingsService` (`PlayerPrefsSettings`, the only class that touches PlayerPrefs); progress stays in save.json

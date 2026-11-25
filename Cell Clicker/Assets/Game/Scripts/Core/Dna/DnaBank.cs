@@ -16,6 +16,9 @@ namespace CellClicker.Core
         /// <summary>Fired with the new total whenever DNA changes.</summary>
         public event Action<double> Changed;
 
+        /// <summary>Fired with the amount whenever DNA is earned (not when it is spent or loaded).</summary>
+        public event Action<double> Earned;
+
         public string SaveKey => "dna";
 
         private void Awake()
@@ -28,6 +31,7 @@ namespace CellClicker.Core
             if (amount <= 0) return;
 
             Amount += amount;
+            Earned?.Invoke(amount);
             Changed?.Invoke(Amount);
         }
 

@@ -11,6 +11,7 @@ namespace CellClicker.EditorTools
         public const string Game = "Assets/Game";
         public const string Data = Game + "/Data";
         public const string Organisms = Data + "/Organisms";
+        public const string Upgrades = Data + "/Upgrades";
         public const string Scenes = Game + "/Scenes";
         public const string Fonts = Game + "/Art/Fonts";
 

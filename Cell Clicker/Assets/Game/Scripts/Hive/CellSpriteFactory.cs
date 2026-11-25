@@ -37,17 +37,7 @@ namespace CellClicker.Hive
 
         public static Sprite Create(int size = 512)
         {
-            var pixels = new Color32[size * size];
-            float aa = 2f / size; // one pixel in [-1, 1] space, used for anti-aliasing
-
-            for (int y = 0; y < size; y++)
-            {
-                for (int x = 0; x < size; x++)
-                {
-                    var p = new Vector2((x + 0.5f) / size * 2f - 1f, (y + 0.5f) / size * 2f - 1f);
-                    pixels[y * size + x] = Shade(p, aa);
-                }
-            }
+            Color32[] pixels = Draw(size);
 
             var texture = new Texture2D(size, size, TextureFormat.RGBA32, false)
             {
@@ -59,6 +49,23 @@ namespace CellClicker.Hive
             texture.Apply(false, true); // true = drop the CPU copy, halves the texture's memory
 
             return Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        /// <summary>The hive's pixels (size x size, transparent around the cell). Also used to make the app icon.</summary>
+        public static Color32[] Draw(int size)
+        {
+            var pixels = new Color32[size * size];
+            float aa = 2f / size; // one pixel in [-1, 1] space, used for anti-aliasing
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    var p = new Vector2((x + 0.5f) / size * 2f - 1f, (y + 0.5f) / size * 2f - 1f);
+                    pixels[y * size + x] = Shade(p, aa);
+                }
+            }
+            return pixels;
         }
 
         private static Color Shade(Vector2 p, float aa)

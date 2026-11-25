@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using CellClicker.Core;
+using CellClicker.Platform;
 using UnityEngine;
 
 namespace CellClicker.Organisms
@@ -8,12 +9,16 @@ namespace CellClicker.Organisms
     /// <summary>
     /// Owns the player's Organisms and levels them up with DNA. Reports their combined DNA/sec as an
     /// <see cref="IDnaSource"/>; the <see cref="DnaGenerator"/> turns that into DNA.
+    /// Which Organisms exist, and in what order, comes from <see cref="EconomyConfig"/> through <c>Services.Config</c>;
+    /// Upgrades (through <see cref="IDnaModifiers"/>) can make every Organism Level cheaper.
     /// </summary>
     public class OrganismRoster : MonoBehaviour, IDnaSource, ISaveable
     {
         [SerializeField] private DnaBank bank;
-        [Tooltip("In unlock order: each Organism is revealed once the one before it is recruited.")]
-        [SerializeField] private OrganismDefinition[] definitions;
+        [Tooltip("Optional. A component that implements IDnaModifiers, e.g. the UpgradeSystem.")]
+        [SerializeField] private MonoBehaviour modifiersSource;
+
+        private IDnaModifiers modifiers;
 
         private readonly List<Organism> organisms = new List<Organism>();
 
@@ -25,10 +30,18 @@ namespace CellClicker.Organisms
         /// <summary>Fired after an Organism gains an Organism Level.</summary>
         public event Action<Organism> LevelChanged;
 
+        /// <summary>Fired when an Upgrade changes every Organism's price.</summary>
+        public event Action CostsChanged;
+
         public string SaveKey => "organisms";
 
         private void Awake()
         {
+            modifiers = modifiersSource as IDnaModifiers;
+            if (modifiersSource != null && modifiers == null)
+                Debug.LogError($"{modifiersSource.name} does not implement IDnaModifiers.", this);
+
+            OrganismDefinition[] definitions = Services.Config.Economy()?.Organisms;
             if (definitions == null) return;
 
             foreach (OrganismDefinition definition in definitions)
@@ -44,11 +57,29 @@ namespace CellClicker.Organisms
             return index == 0 || (index > 0 && organisms[index - 1].IsRecruited);
         }
 
-        public bool CanLevelUp(Organism organism) => IsUnlocked(organism) && bank.CanAfford(organism.NextCost);
+        private void OnEnable()
+        {
+            if (modifiers != null) modifiers.Changed += OnModifiersChanged;
+        }
+
+        private void OnDisable()
+        {
+            if (modifiers != null) modifiers.Changed -= OnModifiersChanged;
+        }
+
+        /// <summary>The DNA the next Organism Level costs, after Upgrade discounts. Never below 1.</summary>
+        public double CostOf(Organism organism)
+        {
+            double cost = organism.NextCost;
+            if (modifiers != null) cost = Math.Max(1, Math.Floor(cost * modifiers.OrganismCostMultiplier));
+            return cost;
+        }
+
+        public bool CanLevelUp(Organism organism) => IsUnlocked(organism) && bank.CanAfford(CostOf(organism));
 
         public bool TryLevelUp(Organism organism)
         {
-            if (!IsUnlocked(organism) || !bank.TrySpend(organism.NextCost)) return false;
+            if (!IsUnlocked(organism) || !bank.TrySpend(CostOf(organism))) return false;
 
             organism.LevelUp();
             RecalculateRate();
@@ -82,6 +113,8 @@ namespace CellClicker.Organisms
             }
             RecalculateRate();
         }
+
+        private void OnModifiersChanged() => CostsChanged?.Invoke();
 
         private void RecalculateRate()
         {

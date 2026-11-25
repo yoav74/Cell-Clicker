@@ -16,7 +16,7 @@ MonoBehaviour:
   saveId: volvox
   icon: {fileID: 0}
   tint: {r: 0.8039216, g: 0.5882353, b: 1, a: 1}
-  baseCost: 130000
+  baseCost: 310000
   costGrowth: 1.15
-  firstLevelDnaPerSecond: 256
-  dnaPerSecondPerLevel: 128
+  firstLevelDnaPerSecond: 21000
+  dnaPerSecondPerLevel: 4200

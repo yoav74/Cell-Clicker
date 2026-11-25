@@ -87,28 +87,32 @@ namespace CellClicker.EditorTools
             RectTransform cell = Pin(Create("Cell", safe), new Vector2(0.5f, 0.62f), new Vector2(380f, 380f), Vector2.zero);
             AddPlaceholder(cell.gameObject, ProceduralSpriteKind.Cell, Teal);
 
-            BuildTotal(safe, out TMP_Text total, out TMP_Text rate);
+            BuildTotal(safe, out TMP_Text total, out TMP_Text rate, out TMP_Text lastVisit);
             GameObject awayCard = BuildAwayCard(safe, out TMP_Text awayAmount, out TMP_Text awayDetail);
 
             Button play = BuildPlayButton(safe);
             UnityEventTools.AddPersistentListener(play.onClick, flow.Play);
 
             var home = canvasGo.AddComponent<HomeScreenUI>();
-            Wire(home, "offlineSettings", OfflineEarningsDefaults.GetOrCreate());
             Wire(home, "totalText", total);
             Wire(home, "rateText", rate);
+            Wire(home, "lastVisitText", lastVisit);
             Wire(home, "awayCard", awayCard);
             Wire(home, "awayAmountText", awayAmount);
             Wire(home, "awayDetailText", awayDetail);
         }
 
-        private static void BuildTotal(Transform safe, out TMP_Text total, out TMP_Text rate)
+        private static void BuildTotal(Transform safe, out TMP_Text total, out TMP_Text rate, out TMP_Text lastVisit)
         {
             RectTransform totalRect = Pin(Create("DNA Total", safe), new Vector2(0.5f, 0.45f), new Vector2(900f, 150f), Vector2.zero);
             total = AddText(totalRect.gameObject, "0", 130, Color.white, TmpSetup.GlowPreset);
 
             RectTransform rateRect = Pin(Create("DNA per Second", safe), new Vector2(0.5f, 0.45f), new Vector2(900f, 60f), new Vector2(0f, -110f));
             rate = AddText(rateRect.gameObject, "0 DNA/sec", 44, RateColor, TmpSetup.SoftShadowPreset);
+
+            // The loop's reward: what the last visit to the Level earned.
+            RectTransform lastRect = Pin(Create("Last Visit", safe), new Vector2(0.5f, 0.45f), new Vector2(900f, 60f), new Vector2(0f, -175f));
+            lastVisit = AddText(lastRect.gameObject, "Last visit: +0 DNA", 44, Teal, TmpSetup.SoftShadowPreset);
         }
 
         private static GameObject BuildAwayCard(Transform safe, out TMP_Text amount, out TMP_Text detail)

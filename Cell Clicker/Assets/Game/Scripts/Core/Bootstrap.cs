@@ -14,6 +14,8 @@ namespace CellClicker.Core
         [SerializeField] private int targetFrameRate = 60;
         [Tooltip("The first screen, opened once every service is ready.")]
         [SerializeField] private string firstScene = "Home";
+        [Tooltip("Every economy number. Services are plain classes with no Inspector, so Bootstrap holds the asset and hands it over.")]
+        [SerializeField] private EconomyConfig economy;
 
         private void Awake()
         {
@@ -22,6 +24,7 @@ namespace CellClicker.Core
             // Order matters: Sound and Haptics read the Settings, so Settings comes first.
             Services.Settings = new PlayerPrefsSettings();
             Services.Save = new JsonFileSave();
+            Services.Config = new ScriptableObjectConfigService(economy);
             Services.Sound = new AudioSourceSound(Services.Settings);
             Services.Haptics = new AndroidHaptics(Services.Settings);
 
